@@ -1,0 +1,21 @@
+//
+//  ContentView.swift
+//  AiChatUi
+//
+//  Created by Measna on 27/4/25.
+//
+
+import SwiftUI
+
+struct ContentView: View {
+    var body: some View {
+        NavigationView {
+            ChatView()
+                .navigationTitle("Chat")
+        }
+    }
+}
+
+#Preview {
+    ContentView()
+}
