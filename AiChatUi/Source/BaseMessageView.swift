@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-protocol MessageBaseModel: Decodable {
-    static func getMessageType() -> String
-    func getMessageView() -> AnyView
+protocol BaseMessageView : Decodable {
+    static var messageType: String { get }
+    var body: AnyView { get }
 }
 
-extension MessageBaseModel {
+extension BaseMessageView {
     func toMessageView() -> MessageView {
         return MessageView(self)
     }

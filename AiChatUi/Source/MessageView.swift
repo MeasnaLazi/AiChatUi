@@ -9,16 +9,20 @@ import SwiftUI
 
 struct MessageView: Identifiable, Equatable {
     let id: UUID = UUID()
-    private let wrapped: any MessageBaseModel
     let viewProvider: () -> AnyView
+    private let model: any BaseMessageView
 
-    init(_ message: some MessageBaseModel) {
-        self.wrapped = message
-        self.viewProvider = { message.getMessageView() }
+    init(_ model: some BaseMessageView) {
+        self.model = model
+        self.viewProvider = { model.body }
     }
 
-    func getMessageView() -> AnyView {
+    func getBody() -> AnyView {
         viewProvider()
+    }
+    
+    func getModel() -> BaseMessageView {
+        model
     }
     
     static func == (lhs: Self, rhs: Self) -> Bool {

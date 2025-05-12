@@ -12,14 +12,16 @@ struct TextSingleImageMessage {
     var image: String
 }
 
-extension TextSingleImageMessage : MessageBaseModel {
-    static func getMessageType() -> String {
-        return "text_single_image"
+extension TextSingleImageMessage : BaseMessageView {
+    static var messageType: String {
+        "text_single_image"
     }
-    func getMessageView() -> AnyView {
-        return AnyView(VStack {
-            Text(text)
-            Text(image)
-        })
+    var body: AnyView {
+        AnyView(
+            VStack {
+                Text(text)
+                Text(image)
+            }
+        )
     }
 }

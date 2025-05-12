@@ -11,11 +11,11 @@ struct TextOnlyMessage {
     var text: String
 }
 
-extension TextOnlyMessage : MessageBaseModel {
-    static func getMessageType() -> String {
-        return "text_only"
+extension TextOnlyMessage : BaseMessageView {
+    static var messageType: String {
+        "text_only"
     }
-    func getMessageView() -> AnyView {
-        return AnyView(Text(text))
+    var body: AnyView {
+        AnyView(Text(text))
     }
 }

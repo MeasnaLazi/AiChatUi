@@ -19,7 +19,7 @@ struct ChatView: View {
                 ScrollView {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.messages, id: \.id) { message in
-                            message.getMessageView()
+                            message.getBody()
                         }
                     }
                     .padding()
@@ -90,10 +90,9 @@ struct ChatView: View {
             let data = jsonTextSingleImage.data(using: .utf8)!
 
             if let test = try? decoder.decode(Test.self, from: data) {
-                   print("test: \(test.content)")
-                
+                print("test: \(test.content)")
                 viewModel.addMessgae(message: test.content.toMessageView())
-               }
+            }
         }
     }
 }
