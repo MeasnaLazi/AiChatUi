@@ -8,12 +8,12 @@
 import SwiftUI
 
 protocol BaseMessageView : Decodable {
-    static var messageType: String { get }
+    static var render: String { get }
     var body: AnyView { get }
 }
 
 extension BaseMessageView {
-    func toMessageView() -> MessageView {
-        return MessageView(self)
+    func toAnyView() -> AnyView {
+        return AnyView(self.body)
     }
 }

@@ -13,7 +13,7 @@ struct TextSingleImageMessage {
 }
 
 extension TextSingleImageMessage : BaseMessageView {
-    static var messageType: String {
+    static var render: String {
         "text_single_image"
     }
     var body: AnyView {

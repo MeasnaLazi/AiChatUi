@@ -19,7 +19,7 @@ struct ChatView: View {
                 ScrollView {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.messages, id: \.id) { message in
-                            message.getBody()
+                            message.body()
                         }
                     }
                     .padding()
@@ -38,8 +38,8 @@ struct ChatView: View {
                 
                 Button(action: {
                     if !userInput.isEmpty {
-                        viewModel.addMessgae(message: TextOnlyMessage(text: userInput).toMessageView())
-                        userInput = ""
+//                        viewModel.addMessgae(message: TextOnlyMessage(text: userInput).toMessageView())
+//                        userInput = ""
                     }
                 }) {
                     Image(systemName: "paperplane.fill")
@@ -68,31 +68,49 @@ struct ChatView: View {
 //            }
 //        )
         .onAppear() {
-            let jsonTextOnly = """
-                {   
-                    "message_type": "text_only",
-                    "content": {
-                        "text": "hi"
-                    }
-                }
-                """
-            let jsonTextSingleImage = """
-                {   
-                    "message_type": "text_single_image",
-                    "content": {
-                        "text": "hi",
-                        "image": "lazi!"
-                    }
-                }
-                """
             
-            let decoder = JSONDecoder()
-            let data = jsonTextSingleImage.data(using: .utf8)!
+            if let url = Bundle.main.url(forResource: "test", withExtension: "json") {
+                    do {
+                        let data = try Data(contentsOf: url)
+                        let decoder = JSONDecoder()
+                        let jsonData = try decoder.decode(Response.self, from: data)
+//                        let messageContent = MessageContent(text: jsonData.content)
+                        let body = MessageView(text: jsonData.content)
+                        viewModel.addMessgae(message: body)
+//                        viewModel.addMessgae(message: jsonData.content.toMessageView())
+                        
+//                        let jsonData = try decoder.decode(MarkDownMessageView.self, from: data)
+                    } catch {
+                        print("error:\(error)")
+                    }
+                }
+            
+//            let jsonTextOnly = """
+//                {   
+//                    message_type: "text_only",
+//                    content: {
+//                        text: "Hii"
+//                    }
+//                }
+//                """
+//            let jsonTextSingleImage = """
+//                {   
+//                    "message_type": "text_single_image",
+//                    "content": {
+//                        "text": "hi",
+//                        "image": "lazi!"
+//                    }
+//                }
+//                """
+            
+           
 
-            if let test = try? decoder.decode(Test.self, from: data) {
-                print("test: \(test.content)")
-                viewModel.addMessgae(message: test.content.toMessageView())
-            }
+//            if let test = try? decoder.decode(Test.self, from: data) {
+////                print("test: \(test.content)")
+//                viewModel.addMessgae(message: test.content.toMessageView())
+//            } else {
+//                print("failed!!")
+//            }
         }
     }
 }
