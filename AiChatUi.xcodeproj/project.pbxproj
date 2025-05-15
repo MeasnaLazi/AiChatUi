@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		5540B3992DD4051C00E6F00A /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5540B3982DD4051C00E6F00A /* MarkdownUI */; };
 		5540B39F2DD407FA00E6F00A /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 5540B39E2DD407FA00E6F00A /* Markdown */; };
+		55B341262DD5577F00950641 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 55B341252DD5577F00950641 /* Splash */; };
+		55B341282DD5577F00950641 /* SplashHTMLGen in Frameworks */ = {isa = PBXBuildFile; productRef = 55B341272DD5577F00950641 /* SplashHTMLGen */; };
+		55B3412A2DD5577F00950641 /* SplashImageGen in Frameworks */ = {isa = PBXBuildFile; productRef = 55B341292DD5577F00950641 /* SplashImageGen */; };
+		55B3412C2DD5577F00950641 /* SplashMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = 55B3412B2DD5577F00950641 /* SplashMarkdown */; };
+		55B3412E2DD5577F00950641 /* SplashTokenizer in Frameworks */ = {isa = PBXBuildFile; productRef = 55B3412D2DD5577F00950641 /* SplashTokenizer */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,8 +62,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55B3412E2DD5577F00950641 /* SplashTokenizer in Frameworks */,
 				5540B3992DD4051C00E6F00A /* MarkdownUI in Frameworks */,
 				5540B39F2DD407FA00E6F00A /* Markdown in Frameworks */,
+				55B341262DD5577F00950641 /* Splash in Frameworks */,
+				55B341282DD5577F00950641 /* SplashHTMLGen in Frameworks */,
+				55B3412C2DD5577F00950641 /* SplashMarkdown in Frameworks */,
+				55B3412A2DD5577F00950641 /* SplashImageGen in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +131,11 @@
 			packageProductDependencies = (
 				5540B3982DD4051C00E6F00A /* MarkdownUI */,
 				5540B39E2DD407FA00E6F00A /* Markdown */,
+				55B341252DD5577F00950641 /* Splash */,
+				55B341272DD5577F00950641 /* SplashHTMLGen */,
+				55B341292DD5577F00950641 /* SplashImageGen */,
+				55B3412B2DD5577F00950641 /* SplashMarkdown */,
+				55B3412D2DD5577F00950641 /* SplashTokenizer */,
 			);
 			productName = AiChatUi;
 			productReference = 5511AA152DBF07DA00289625 /* AiChatUi.app */;
@@ -207,6 +222,7 @@
 			packageReferences = (
 				5540B3972DD4051C00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				5540B39D2DD407FA00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown" */,
+				55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5511AA162DBF07DA00289625 /* Products */;
@@ -581,6 +597,14 @@
 				minimumVersion = 0.6.0;
 			};
 		};
+		55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JohnSundell/Splash";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.16.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -593,6 +617,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5540B39D2DD407FA00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown" */;
 			productName = Markdown;
+		};
+		55B341252DD5577F00950641 /* Splash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = Splash;
+		};
+		55B341272DD5577F00950641 /* SplashHTMLGen */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashHTMLGen;
+		};
+		55B341292DD5577F00950641 /* SplashImageGen */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashImageGen;
+		};
+		55B3412B2DD5577F00950641 /* SplashMarkdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashMarkdown;
+		};
+		55B3412D2DD5577F00950641 /* SplashTokenizer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashTokenizer;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

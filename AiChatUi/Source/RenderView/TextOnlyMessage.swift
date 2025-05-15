@@ -11,11 +11,13 @@ struct TextOnlyMessage {
     var text: String
 }
 
-extension TextOnlyMessage : BaseMessageView {
+extension TextOnlyMessage: BaseRenderView {
+    
     static var render: String {
         "text_only"
     }
-    var body: AnyView {
-        AnyView(Text(text).background(.green))
+    
+    var body: some View {
+        Text(text).background(.green)
     }
 }

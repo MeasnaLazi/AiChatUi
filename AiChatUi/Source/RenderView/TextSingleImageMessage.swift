@@ -12,16 +12,16 @@ struct TextSingleImageMessage {
     var image: String
 }
 
-extension TextSingleImageMessage : BaseMessageView {
+extension TextSingleImageMessage: BaseRenderView {
+    
     static var render: String {
         "text_single_image"
     }
-    var body: AnyView {
-        AnyView(
-            VStack {
-                Text(text)
-                Text(image)
-            }
-        )
+    
+    var body: some View {
+        VStack {
+            Text(text)
+            Text(image)
+        }
     }
 }

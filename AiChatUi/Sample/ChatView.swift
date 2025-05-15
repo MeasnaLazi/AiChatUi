@@ -19,7 +19,7 @@ struct ChatView: View {
                 ScrollView {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.messages, id: \.id) { message in
-                            message.body()
+                            message
                         }
                     }
                     .padding()
