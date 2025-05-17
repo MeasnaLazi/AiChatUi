@@ -12,24 +12,31 @@ struct ChatView: View {
     @ObservedObject private var viewModel = ChatViewModel()
     @State private var userInput = ""
     
+    @Environment(\.pixelLength) private var pixelLength
+    @State private var scrollPosition: UUID?
+    
     var body: some View {
         VStack {
-            // Chat messages
-            ScrollViewReader { proxy in
+            GeometryReader { geoProxy in
+                let scrollViewHeight = geoProxy.size.height
                 ScrollView {
-                    LazyVStack(spacing: 10) {
+                    VStack(spacing: 10) {
                         ForEach(viewModel.messages, id: \.id) { message in
+                   
                             message
+                                .id(message.id)
+                                .frame(
+                                    minHeight: message.id == viewModel.messages.last?.id ? scrollViewHeight : nil,
+                                    alignment: .top
+                                )
                         }
                     }
-                    .padding()
+                    .scrollTargetLayout()
+                    .padding(.horizontal)
                 }
-                .onChange(of: viewModel.messages) { old, new in
-                    withAnimation {
-                        proxy.scrollTo(viewModel.messages.last?.id)
-                    }
-                }
+                .scrollPosition(id: $scrollPosition, anchor: .top)
             }
+            .padding(.top, pixelLength)
             
             // Input area
             HStack {
@@ -38,8 +45,17 @@ struct ChatView: View {
                 
                 Button(action: {
                     if !userInput.isEmpty {
-//                        viewModel.addMessgae(message: TextOnlyMessage(text: userInput).toMessageView())
-//                        userInput = ""
+                        let message = MessageView(text: userInput, type: .you)
+                        viewModel.addMessgae(message: message)
+                        withAnimation {
+                            scrollPosition = message.id
+                        }
+                        userInput = ""
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            let assistantMessage = MessageView(text: "Hold on, let me fetch the best answer for you!", type: .agent )
+                            viewModel.addMessgae(message: assistantMessage)
+                        }
                     }
                 }) {
                     Image(systemName: "paperplane.fill")
@@ -75,11 +91,8 @@ struct ChatView: View {
                         let decoder = JSONDecoder()
                         let jsonData = try decoder.decode(Response.self, from: data)
 //                        let messageContent = MessageContent(text: jsonData.content)
-                        let body = MessageView(text: jsonData.content)
+                        let body = MessageView(text: jsonData.content, type: .agent)
                         viewModel.addMessgae(message: body)
-//                        viewModel.addMessgae(message: jsonData.content.toMessageView())
-                        
-//                        let jsonData = try decoder.decode(MarkDownMessageView.self, from: data)
                     } catch {
                         print("error:\(error)")
                     }

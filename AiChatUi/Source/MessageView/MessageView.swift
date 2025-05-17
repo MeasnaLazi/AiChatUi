@@ -9,14 +9,61 @@ import SwiftUI
 import MarkdownUI
 import Splash
 
+enum MessageType {
+    case you
+    case agent
+}
+
 struct MessageView: View, Identifiable, Equatable {
     
     @Environment(\.colorScheme) private var colorScheme
     
     let id: UUID = UUID()
     let text: String
+    let type: MessageType
     
     var body: some View {
+        switch type {
+        case .you:
+            youView
+        case .agent:
+            agentView
+        }
+        
+    }
+    
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    private var theme: Splash.Theme {
+        switch self.colorScheme {
+        case .dark:
+            return .wwdc17(withFont: .init(size: 16))
+        default:
+            return .sunset(withFont: .init(size: 16))
+        }
+    }
+    
+    @ViewBuilder
+    private var youView: some View {
+        HStack {
+            Spacer()
+            ZStack(alignment: .bottomTrailing) {
+                Text(text)
+                    .foregroundColor(.white)
+                    .padding(8)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .background(.black.opacity(0.7))
+            .cornerRadius(12)
+            .padding(.leading, 10)
+        }
+    }
+    
+    @ViewBuilder
+    private var agentView: some View {
         Markdown(text)
             .markdownBlockStyle(\.codeBlock) {
                 if $0.language == "json", let renderView = RenderView(text: $0.content) {
@@ -48,19 +95,5 @@ struct MessageView: View, Identifiable, Equatable {
                 Image(systemName: configuration.isCompleted ? "checkmark.circle.fill" : "circle")
                     .relativeFrame(minWidth: .em(1.5), alignment: .trailing)
             }
-    }
-    
-    
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    private var theme: Splash.Theme {
-        switch self.colorScheme {
-        case .dark:
-            return .wwdc17(withFont: .init(size: 16))
-        default:
-            return .sunset(withFont: .init(size: 16))
-        }
     }
 }
