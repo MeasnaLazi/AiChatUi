@@ -9,121 +9,125 @@ import SwiftUI
 
 // Main Chat View
 struct ChatView: View {
+    @Environment(\.aiChatTheme) private var theme
+    
     @ObservedObject private var viewModel = ChatViewModel()
-    @State private var userInput = ""
+    @State private var askSomethingTextField = ""
     
     @Environment(\.pixelLength) private var pixelLength
-    @State private var scrollPosition: UUID?
+    @State private var scrollPositionUUID: UUID?
     
     var body: some View {
         VStack {
-            GeometryReader { geoProxy in
-                let scrollViewHeight = geoProxy.size.height
-                ScrollView {
-                    VStack(spacing: 10) {
-                        ForEach(viewModel.messages, id: \.id) { message in
-                   
-                            message
-                                .id(message.id)
-                                .frame(
-                                    minHeight: message.id == viewModel.messages.last?.id ? scrollViewHeight : nil,
-                                    alignment: .top
-                                )
+            listView
+            inputView
+        }
+        .animation(.easeInOut, value: viewModel.messageViews)
+        .onAppear() {
+            let youMessageView = MessageView(text: "Hey, hi!", type: .you)
+            viewModel.addMessageView(messageView: youMessageView)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if let url = Bundle.main.url(forResource: "test", withExtension: "json") {
+                        do {
+                            let data = try Data(contentsOf: url)
+                            let decoder = JSONDecoder()
+                            let jsonData = try decoder.decode(Response.self, from: data)
+                            let agentMessageView = MessageView(text: jsonData.content, type: .agent)
+                            viewModel.addMessageView(messageView: agentMessageView)
+                        } catch {
+                            print("error:\(error)")
                         }
                     }
-                    .scrollTargetLayout()
-                    .padding(.horizontal)
-                }
-                .scrollPosition(id: $scrollPosition, anchor: .top)
             }
-            .padding(.top, pixelLength)
+        }
+    }
+    
+    @ViewBuilder
+    private var listView: some View {
+        GeometryReader { geoReader in
+            let scrollViewHeight = geoReader.size.height
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(viewModel.messageViews, id: \.id) { messageView in
+                        messageView
+                            .id(messageView.id)
+                            .frame(
+                                minHeight: messageView.id == viewModel.messageViews.last?.id ? scrollViewHeight : nil,
+                                alignment: .top
+                            )
+                    }
+                }
+                .scrollTargetLayout()
+                .padding(.horizontal)
+            }
+            .scrollPosition(id: $scrollPositionUUID, anchor: .top)
+        }
+        .padding(.top, pixelLength)
+    }
+    
+    @ViewBuilder
+    private var inputView: some View {
+        VStack {
+            TextField("", text: $askSomethingTextField, prompt: Text("Ask something").foregroundColor(theme.colors.inputPlaceholderTextFG))
+                .font(.system(size: 16))
+                .foregroundColor(theme.colors.inputTextFG)
+                .overlay(EmptyView())
+                .background(.clear)
+                .padding([.leading, .trailing])
+                .padding(.top, 10)
+                .padding(.bottom, 6)
             
-            // Input area
             HStack {
-                TextField("Type a message...", text: $userInput)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                Button(action: {
+                    print("file clicked!")
+                }) {
+                    Image(systemName: "paperclip")
+                        .font(.system(size: 13))
+                        .padding(6)
+                        .background(theme.colors.inputButtonIconBG)
+                        .foregroundColor(theme.colors.inputButtonIconFG)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                
+                Spacer()
                 
                 Button(action: {
-                    if !userInput.isEmpty {
-                        let message = MessageView(text: userInput, type: .you)
-                        viewModel.addMessgae(message: message)
+                    if !askSomethingTextField.isEmpty {
+                        let messageView = MessageView(text: askSomethingTextField, type: .you)
+                        viewModel.addMessageView(messageView: messageView)
                         withAnimation {
-                            scrollPosition = message.id
+                            scrollPositionUUID = messageView.id
                         }
-                        userInput = ""
+                        askSomethingTextField = ""
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            let assistantMessage = MessageView(text: "Hold on, let me fetch the best answer for you!", type: .agent )
-                            viewModel.addMessgae(message: assistantMessage)
+                            let assistantMessage = MessageView(text: "Hold on!", type: .agent )
+                            viewModel.addMessageView(messageView: assistantMessage)
                         }
                     }
                 }) {
-                    Image(systemName: "paperplane.fill")
-                        .foregroundColor(.blue)
-                }
-                
-                // Additional input types (file, voice, video)
-                Menu {
-//                    Button("Send File") { viewModel.addUserMessage(content: .file(URL(string: "https://example.com/file.pdf")!)) }
-//                    Button("Send Voice") { viewModel.addUserMessage(content: .voice(URL(string: "https://example.com/voice.mp3")!)) }
-//                    Button("Send Video") { viewModel.addUserMessage(content: .video(URL(string: "https://example.com/video.mp4")!)) }
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.blue)
+                    if askSomethingTextField.isEmpty {
+                        Image(systemName: "waveform" )
+                            .font(.system(size: 16))
+                            .foregroundColor(theme.colors.inputButtonIconFG)
+                    } else {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 14))
+                            .padding(6)
+                            .background(theme.colors.inputSendButtonIconBG)
+                            .foregroundColor(theme.colors.inputSendButtonIconFG)
+                            .clipShape(Circle())
+                    }
+      
                 }
             }
-            .padding()
+            .padding([.leading, .trailing])
+            .padding(.bottom, 8)
         }
-        .animation(.easeInOut, value: viewModel.messages)
-//        .overlay(
-//            Group {
-//                if viewModel.isLoading {
-//                    ProgressView()
-//                        .progressViewStyle(CircularProgressViewStyle())
-//                }
-//            }
-//        )
-        .onAppear() {
-            
-            if let url = Bundle.main.url(forResource: "test", withExtension: "json") {
-                    do {
-                        let data = try Data(contentsOf: url)
-                        let decoder = JSONDecoder()
-                        let jsonData = try decoder.decode(Response.self, from: data)
-//                        let messageContent = MessageContent(text: jsonData.content)
-                        let body = MessageView(text: jsonData.content, type: .agent)
-                        viewModel.addMessgae(message: body)
-                    } catch {
-                        print("error:\(error)")
-                    }
-                }
-            
-//            let jsonTextOnly = """
-//                {   
-//                    message_type: "text_only",
-//                    content: {
-//                        text: "Hii"
-//                    }
-//                }
-//                """
-//            let jsonTextSingleImage = """
-//                {   
-//                    "message_type": "text_single_image",
-//                    "content": {
-//                        "text": "hi",
-//                        "image": "lazi!"
-//                    }
-//                }
-//                """
-            
-           
-
-//            if let test = try? decoder.decode(Test.self, from: data) {
-////                print("test: \(test.content)")
-//                viewModel.addMessgae(message: test.content.toMessageView())
-//            } else {
-//                print("failed!!")
-//            }
-        }
+        .background(theme.colors.inputBG)
+        .cornerRadius(12)
+        .padding([.top, .bottom], 6)
+        .padding([.leading, .trailing], 12)
     }
 }

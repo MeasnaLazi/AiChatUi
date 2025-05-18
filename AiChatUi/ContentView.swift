@@ -8,10 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @Environment(\.colorScheme) private var colorScheme
+
+    var aiChattheme: AiChatTheme {
+        colorScheme == .dark ? .dark : .light
+    }
+    
     var body: some View {
         NavigationView {
             ChatView()
                 .navigationTitle("Chat")
+                .aiChatTheme(aiChattheme)
         }
     }
 }

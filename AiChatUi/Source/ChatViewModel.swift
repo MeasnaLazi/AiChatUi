@@ -8,10 +8,10 @@
 import Foundation
 
 class ChatViewModel : ObservableObject {
-    @Published var messages: [MessageView] = []
+    @Published var messageViews: [MessageView] = []
     
-    func addMessgae(message: MessageView) {
-        messages.append(message)
+    func addMessageView(messageView: MessageView) {
+        messageViews.append(messageView)
     }
     
 }

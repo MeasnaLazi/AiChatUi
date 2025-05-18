@@ -9,37 +9,44 @@ import SwiftUI
 import MarkdownUI
 import Splash
 
-struct CustomCodeBlock: View {
+struct CustomCodeBlockView: View {
+    @Environment(\.aiChatTheme) private var aiChatTheme
+    
     @State private var isCopied: Bool = false
     
     let configuration: CodeBlockConfiguration
     let theme: Splash.Theme
+    let WAIT_IN_SEC_AFTER_CLICK_COPIED = 3.0
     
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 Text(configuration.language ?? "plain text")
                     .font(.system(.caption, design: .monospaced))
-                    .fontWeight(.semibold)
-                    .foregroundColor(Color(theme.plainTextColor))
+                    .foregroundColor(aiChatTheme.colors.codeBlockHeaderFG)
                 
                 Spacer()
-
-                Image(systemName: isCopied ? "list.bullet.clipboard" : "clipboard")
-                    .onTapGesture {
-                        print("copy click")
+                
+                HStack {
+                    Text(isCopied ? "Copied" : "Copy")
+                        .font(.system(size: 12))
+                    Image(systemName: isCopied ? "checkmark" : "document.on.document")
+                        .font(.system(size: 11))
+                }
+                .onTapGesture {
+                    isCopied.toggle()
+                    copyToClipboard(configuration.content)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + WAIT_IN_SEC_AFTER_CLICK_COPIED) {
                         isCopied.toggle()
-                        copyToClipboard(configuration.content)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            isCopied.toggle()
-                        }
-                        
                     }
+                    
+                }
+  
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
             .background {
-                Color(theme.backgroundColor)
+                Color(aiChatTheme.colors.codeBlockHeaderBG)
             }
 
             Divider()
@@ -54,8 +61,11 @@ struct CustomCodeBlock: View {
                     .padding()
             }
         }
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .background(aiChatTheme.colors.codeBlockBG)
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(aiChatTheme.colors.codeBlockBorder, lineWidth: 1)
+        }
         .markdownMargin(top: .zero, bottom: .em(0.8))
     }
     

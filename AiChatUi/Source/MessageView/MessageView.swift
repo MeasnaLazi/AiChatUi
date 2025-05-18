@@ -17,6 +17,7 @@ enum MessageType {
 struct MessageView: View, Identifiable, Equatable {
     
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.aiChatTheme) private var aiChatTheme
     
     let id: UUID = UUID()
     let text: String
@@ -52,48 +53,59 @@ struct MessageView: View, Identifiable, Equatable {
             Spacer()
             ZStack(alignment: .bottomTrailing) {
                 Text(text)
-                    .foregroundColor(.white)
-                    .padding(8)
+                    .foregroundColor(aiChatTheme.colors.youMessageViewFG)
+                    .padding(10)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .background(.black.opacity(0.7))
-            .cornerRadius(12)
-            .padding(.leading, 10)
+            .background(aiChatTheme.colors.youMessageViewBG)
+            .clipShape(RoundedCorner(radius: 12, corners: [.topLeft, .topRight, .bottomLeft]))
+            .padding(.leading, 16)
         }
     }
     
     @ViewBuilder
     private var agentView: some View {
-        Markdown(text)
-            .markdownBlockStyle(\.codeBlock) {
-                if $0.language == "json", let renderView = RenderView(text: $0.content) {
-                    renderView
-                } else {
-                    CustomCodeBlock(configuration: $0, theme: theme)
-                }
-            }
-            .markdownCodeSyntaxHighlighter(.splash(theme: self.theme))
-            .markdownBlockStyle(\.heading1) { configuration in
-                configuration.label
-                    .markdownMargin(top: .em(0.5), bottom: .em(0.5))
-                    .markdownTextStyle {
-                        FontFamily(.custom("Trebuchet MS"))
-                        FontWeight(.bold)
-                        FontSize(.em(1.2))
+        HStack {
+            Markdown(text)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .markdownBlockStyle(\.codeBlock) {
+                    if $0.language?.lowercased() == "json", let renderView = RenderView(text: $0.content) {
+                        renderView
+                    } else {
+                        CustomCodeBlockView(configuration: $0, theme: theme)
                     }
-            }
-            .markdownBlockStyle(\.image) { configuration in
-                configuration.label
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .shadow(radius: 8, y: 8)
-                    .markdownMargin(top: .em(1.6), bottom: .em(1.6))
-            }
-//            .markdownImageProvider(.webImage)
-            .markdownBulletedListMarker(.dash)
-            .markdownNumberedListMarker(.lowerRoman)
-            .markdownBlockStyle(\.taskListMarker) { configuration in
-                Image(systemName: configuration.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .relativeFrame(minWidth: .em(1.5), alignment: .trailing)
-            }
+                }
+                .markdownCodeSyntaxHighlighter(.splash(theme: self.theme))
+                .markdownBlockStyle(\.heading1) { configuration in
+                    configuration.label
+                        .markdownMargin(top: .em(0.5), bottom: .em(0.5))
+                        .markdownTextStyle {
+                            FontWeight(.bold)
+                            FontSize(.em(1.2))
+                        }
+                }
+                .markdownBlockStyle(\.heading2) { configuration in
+                    configuration.label
+                        .markdownMargin(top: .em(0.5), bottom: .em(0.5))
+                        .markdownTextStyle {
+                            FontWeight(.bold)
+                            FontSize(.em(1.0))
+                        }
+                }
+                .markdownBlockStyle(\.image) { configuration in
+                    configuration.label
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .shadow(radius: 8, y: 8)
+                        .markdownMargin(top: .em(1.6), bottom: .em(1.6))
+                }
+    //            .markdownImageProvider(.webImage)
+                .markdownBulletedListMarker(.dash)
+                .markdownNumberedListMarker(.lowerRoman)
+                .markdownBlockStyle(\.taskListMarker) { configuration in
+                    Image(systemName: configuration.isCompleted ? "checkmark.circle.fill" : "circle")
+                        .relativeFrame(minWidth: .em(1.5), alignment: .trailing)
+                }
+        }
+        Spacer()
     }
 }
