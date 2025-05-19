@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ChatViewModel : ObservableObject {
+public class ChatViewModel : ObservableObject {
     @Published var messageViews: [MessageView] = []
     
     func addMessageView(messageView: MessageView) {
@@ -15,3 +15,8 @@ class ChatViewModel : ObservableObject {
     }
     
 }
+
+//protocol ChatViewModel : ObservableObject {
+//    var messageViews: [MessageView] { get set }
+//    func sendTextMessage(text: String)
+//}

@@ -18,8 +18,9 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ChatView()
-                .navigationTitle("Chat")
                 .aiChatTheme(aiChattheme)
+                .navigationTitle("Chat")
+                .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
