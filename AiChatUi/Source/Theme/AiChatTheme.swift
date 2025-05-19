@@ -57,6 +57,7 @@ public struct AiChatTheme {
         public var inputSendButtonIconFG: Color
         public var inputSendButtonIconBG: Color
         public var inputExpandButtonIconFG: Color
+        public var inputCollapeButtonIconFG: Color
         
         public var codeBlockBorder: Color
         public var codeBlockBG: Color
@@ -76,6 +77,7 @@ public struct AiChatTheme {
             inputSendButtonIconFG: Color = Color(hex: 0xf7f9f9),
             inputSendButtonIconBG: Color = Color(hex: 0x0f1419),
             inputExpandButtonIconFG: Color = Color(hex: 0x8a8a8e),
+            inputCollapeButtonIconFG: Color = Color(hex: 0x000000),
             
             codeBlockHeaderBorder: Color = Color(hex: 0xd7d7d7),
             codeBlockBG: Color = Color(hex: 0xffffff),
@@ -94,6 +96,7 @@ public struct AiChatTheme {
             self.inputSendButtonIconFG = inputSendButtonIconFG
             self.inputSendButtonIconBG = inputSendButtonIconBG
             self.inputExpandButtonIconFG = inputExpandButtonIconFG
+            self.inputCollapeButtonIconFG = inputCollapeButtonIconFG
             
             self.codeBlockBorder = codeBlockHeaderBorder
             self.codeBlockBG = codeBlockBG

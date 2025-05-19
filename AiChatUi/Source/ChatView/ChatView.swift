@@ -71,10 +71,12 @@ struct ChatView: View {
     @ViewBuilder
     private var inputView: some View {
         VStack {
-            CustomTextEditor(text: $askSomethingTextField)
-                .padding([.leading, .trailing], 12)
-                .padding(.top, 10)
-                .padding(.bottom, 6)
+            CustomTextEditor(text: $askSomethingTextField) {
+                onSendClick()
+            }
+            .padding([.leading, .trailing], 12)
+            .padding(.top, 10)
+            .padding(.bottom, 6)
     
             HStack {
                 Button(action: {
@@ -91,19 +93,7 @@ struct ChatView: View {
                 Spacer()
                 
                 Button(action: {
-                    if !askSomethingTextField.isEmpty {
-                        let messageView = MessageView(text: askSomethingTextField, type: .you)
-                        viewModel.addMessageView(messageView: messageView)
-                        withAnimation {
-                            scrollPositionUUID = messageView.id
-                        }
-                        askSomethingTextField = ""
-                    
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            let assistantMessage = MessageView(text: "Hold on!", type: .agent )
-                            viewModel.addMessageView(messageView: assistantMessage)
-                        }
-                    }
+                  onSendClick()
                 }) {
                     if askSomethingTextField.isEmpty {
                         Image(systemName: "waveform" )
@@ -127,5 +117,21 @@ struct ChatView: View {
         .cornerRadius(12)
         .padding([.top, .bottom], 6)
         .padding([.leading, .trailing], 12)
+    }
+    
+    private func onSendClick() {
+        if !askSomethingTextField.isEmpty {
+            let messageView = MessageView(text: askSomethingTextField, type: .you)
+            viewModel.addMessageView(messageView: messageView)
+            withAnimation {
+                scrollPositionUUID = messageView.id
+            }
+            askSomethingTextField = ""
+        
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                let assistantMessage = MessageView(text: "Hold on!", type: .agent )
+                viewModel.addMessageView(messageView: assistantMessage)
+            }
+        }
     }
 }

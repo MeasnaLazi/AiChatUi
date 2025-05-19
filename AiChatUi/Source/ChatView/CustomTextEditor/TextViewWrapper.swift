@@ -11,14 +11,16 @@ struct TextViewWrapper: UIViewRepresentable {
     @Environment(\.aiChatTheme) private var theme
     @Binding var text: String
     @Binding var height: CGFloat
+    var fontSize: CGFloat = 16.0
 
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView()
         textView.isScrollEnabled = true
-        textView.font = UIFont.systemFont(ofSize: 16)
+        textView.font = UIFont.systemFont(ofSize: fontSize)
         textView.delegate = context.coordinator
         textView.backgroundColor = .clear
         textView.textColor = theme.colors.inputTextFG.toUIColor()
+        textView.becomeFirstResponder()
         
         return textView
     }
