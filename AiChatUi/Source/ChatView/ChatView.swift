@@ -14,11 +14,9 @@ public struct ChatView: View {
     @ObservedObject private var viewModel: BaseChatViewModel
     @Binding private var inputText: String
     
-    @State private var scrollPositionUUID: UUID?
+    var onSendClicked: (() -> ())?
     
-    var onSendClicked: () -> MessageView
-    
-    public init(viewModel: BaseChatViewModel, inputText: Binding<String>, onSendClicked: @escaping () -> MessageView) {
+    public init(viewModel: BaseChatViewModel, inputText: Binding<String>, onSendClicked: (() -> ())? = nil) {
         self.viewModel = viewModel
         self._inputText =  inputText
         self.onSendClicked = onSendClicked
@@ -69,7 +67,7 @@ public struct ChatView: View {
                 .scrollTargetLayout()
                 .padding(.horizontal)
             }
-            .scrollPosition(id: $scrollPositionUUID, anchor: .top)
+            .scrollPosition(id: $viewModel.scrollPositionUUID, anchor: .top)
         }
         .padding(.top, pixelLength)
     }
@@ -126,21 +124,8 @@ public struct ChatView: View {
     }
     
     private func onSendClick() {
-        if !inputText.isEmpty {
-            let messageView = onSendClicked()
-            withAnimation {
-                scrollPositionUUID = messageView.id
-            }
-            
-//            let messageView = viewModel.sendMessage(content: inputText, type: .text)
-//            withAnimation {
-//                scrollPositionUUID = messageView.id
-//            }
-//            inputText = ""
-        
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                let _ = viewModel.receiveMessage(text: "Hold on!")
-//            }
+        if !inputText.isEmpty, let onSendClicked {
+            onSendClicked()
         }
     }
 }

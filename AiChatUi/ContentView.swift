@@ -20,9 +20,9 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ChatView(viewModel: chatViewModel, inputText: $inputText) {
-                let messageView = chatViewModel.sendMessage(content: inputText, type: .text)
+                let _ = chatViewModel.sendMessage(content: inputText, type: .text)
                 inputText = ""
-                return messageView
+                
             }
             .aiChatTheme(aiChattheme)
             .navigationTitle("Chat")
