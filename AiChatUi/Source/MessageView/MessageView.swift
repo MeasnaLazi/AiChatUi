@@ -9,32 +9,30 @@ import SwiftUI
 import MarkdownUI
 import Splash
 
-enum MessageType {
+public enum MessageType {
     case you
     case agent
 }
 
-struct MessageView: View, Identifiable, Equatable {
+public struct MessageView: View, Identifiable, Equatable {
     
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.aiChatTheme) private var aiChatTheme
     
-    let id: UUID = UUID()
+    public let id: UUID = UUID()
     let text: String
     let type: MessageType
     
-    var body: some View {
+    public var body: some View {
         switch type {
         case .you:
             youView
         case .agent:
             agentView
         }
-        
     }
     
-    
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id
     }
     

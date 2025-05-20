@@ -7,18 +7,24 @@
 
 import SwiftUI
 
-// Main Chat View
-struct ChatView: View {
+public struct ChatView: View {
     @Environment(\.aiChatTheme) private var theme
     @Environment(\.pixelLength) private var pixelLength
     
-    @ObservedObject private var viewModel = ChatViewModel()
+    @ObservedObject private var viewModel: BaseChatViewModel
+    @Binding private var inputText: String
     
-    @State private var askSomethingTextField = ""
     @State private var scrollPositionUUID: UUID?
-    @State private var inputHeight = 0.0
     
-    var body: some View {
+    var onSendClicked: () -> MessageView
+    
+    public init(viewModel: BaseChatViewModel, inputText: Binding<String>, onSendClicked: @escaping () -> MessageView) {
+        self.viewModel = viewModel
+        self._inputText =  inputText
+        self.onSendClicked = onSendClicked
+    }
+    
+    public var body: some View {
         VStack {
             listView
             inputView
@@ -71,7 +77,7 @@ struct ChatView: View {
     @ViewBuilder
     private var inputView: some View {
         VStack {
-            CustomTextEditor(text: $askSomethingTextField) {
+            CustomTextEditor(text: $inputText) {
                 onSendClick()
             }
             .padding([.leading, .trailing], 12)
@@ -95,7 +101,7 @@ struct ChatView: View {
                 Button(action: {
                   onSendClick()
                 }) {
-                    if askSomethingTextField.isEmpty {
+                    if inputText.isEmpty {
                         Image(systemName: "waveform" )
                             .font(.system(size: 16))
                             .foregroundColor(theme.colors.inputButtonIconFG)
@@ -120,18 +126,21 @@ struct ChatView: View {
     }
     
     private func onSendClick() {
-        if !askSomethingTextField.isEmpty {
-            let messageView = MessageView(text: askSomethingTextField, type: .you)
-            viewModel.addMessageView(messageView: messageView)
+        if !inputText.isEmpty {
+            let messageView = onSendClicked()
             withAnimation {
                 scrollPositionUUID = messageView.id
             }
-            askSomethingTextField = ""
+            
+//            let messageView = viewModel.sendMessage(content: inputText, type: .text)
+//            withAnimation {
+//                scrollPositionUUID = messageView.id
+//            }
+//            inputText = ""
         
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                let assistantMessage = MessageView(text: "Hold on!", type: .agent )
-                viewModel.addMessageView(messageView: assistantMessage)
-            }
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                let _ = viewModel.receiveMessage(text: "Hold on!")
+//            }
         }
     }
 }
