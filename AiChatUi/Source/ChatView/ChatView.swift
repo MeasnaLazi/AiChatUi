@@ -28,24 +28,6 @@ public struct ChatView: View {
             inputView
         }
         .animation(.easeInOut, value: viewModel.messageViews)
-        .onAppear() {
-//            let youMessageView = MessageView(text: "Hey, hi!", type: .you)
-//            viewModel.addMessageView(messageView: youMessageView)
-//            
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                if let url = Bundle.main.url(forResource: "test", withExtension: "json") {
-//                        do {
-//                            let data = try Data(contentsOf: url)
-//                            let decoder = JSONDecoder()
-//                            let jsonData = try decoder.decode(Response.self, from: data)
-//                            let agentMessageView = MessageView(text: jsonData.content, type: .agent)
-//                            viewModel.addMessageView(messageView: agentMessageView)
-//                        } catch {
-//                            print("error:\(error)")
-//                        }
-//                    }
-//            }
-        }
     }
     
     @ViewBuilder
