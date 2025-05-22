@@ -24,7 +24,7 @@ extension StayMessageRender: BaseRenderView {
         VStack {
             AnimatedURLImageCarouselView(imageURLs: images.map {URL(string: $0)!})
             HStack {
-                Text("Guest: \(guest)")
+                Text("Allow: \(guest) guest(s)")
                 Spacer()
                 Text("Price: $\(price)")
             }
@@ -33,14 +33,22 @@ extension StayMessageRender: BaseRenderView {
                    UIApplication.shared.open(url)
                 }
             }) {
-                Text("Book Now")
-                    .frame(maxWidth: .infinity)
-                    .font(.subheadline)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(Color.blue.opacity(0.85))
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
+                HStack {
+                    Spacer()
+                    Text("View Detail")
+                        .frame(maxWidth: .infinity)
+                        .font(.subheadline)
+                    
+                    Spacer()
+                    Image(systemName: "globe.americas")
+                        .font(.system(size: 20))
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.blue.opacity(0.85))
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
             .padding(.bottom, 20)
         }
@@ -68,24 +76,24 @@ struct AnimatedURLImageCarouselView: View {
                                 switch phase {
                                 case .empty:
                                     ProgressView()
-                                        .frame(width: geometry.size.width, height: 250)
+                                        .frame(width: geometry.size.width, height: 200)
                                 case .success(let image):
                                     image
                                         .resizable()
                                         .scaledToFill()
-                                        .frame(width: geometry.size.width, height: 250)
+                                        .frame(width: geometry.size.width, height: 200)
                                         .clipped()
                                 case .failure:
                                     Color.gray
-                                        .frame(width: geometry.size.width, height: 250)
+                                        .frame(width: geometry.size.width, height: 200)
                                         .overlay(Text("Failed to load").foregroundColor(.white))
                                 @unknown default:
                                     EmptyView()
                                 }
                             }
                             .transition(.asymmetric(
-                                insertion: .move(edge: direction == .right ? .trailing : .leading),
-                                removal: .move(edge: direction == .right ? .leading : .trailing))
+                                insertion: .move(edge: direction == .right ? .leading : .trailing),
+                                removal: .move(edge: direction == .right ? .trailing : .leading))
                             )
                             .id(index) // Required for animation to trigger correctly
                         }
@@ -93,14 +101,15 @@ struct AnimatedURLImageCarouselView: View {
                 }
                 .animation(.easeInOut(duration: 0.4), value: currentIndex)
             }
-            .frame(height: 250)
+            .frame(height: 200)
+            .cornerRadius(10)
 
             if imageURLs.count > 1 {
                 // Controls
                 HStack {
                     Button(action: {
                         guard currentIndex > 0 else { return }
-                        direction = .left
+                        direction = .right
                         currentIndex -= 1
                     }) {
                         Image(systemName: "chevron.left")
@@ -114,7 +123,7 @@ struct AnimatedURLImageCarouselView: View {
                     
                     Button(action: {
                         guard currentIndex < imageURLs.count - 1 else { return }
-                        direction = .right
+                        direction = .left
                         currentIndex += 1
                     }) {
                         Image(systemName: "chevron.right")
@@ -125,7 +134,7 @@ struct AnimatedURLImageCarouselView: View {
                     .padding(.trailing, 20)
                 }
                 .foregroundColor(.white)
-                .frame(height: 250)
+                .frame(height: 200)
                 
                 // Index label
                 VStack {

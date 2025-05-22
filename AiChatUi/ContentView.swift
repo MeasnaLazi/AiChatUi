@@ -50,11 +50,12 @@ struct ContentView: View {
                 }
             }
             .aiChatTheme(aiChattheme)
-            .navigationTitle("Chat")
+            .navigationTitle("Agent Chat")
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear() {
             RenderViewContext.shared.registerRenderView(model: StayMessageRender.self)
+            RenderViewContext.shared.registerRenderView(model: StayTwoMessageRender.self)
         }
     }
 }

@@ -107,11 +107,7 @@ public struct AiChatTheme {
 }
 
 extension AiChatTheme {
-    static let light = AiChatTheme(colors: .init(
-        inputBG: Color(hex: 0xeff3f4),
-        inputTextFG: Color(hex: 0x111111),
-        inputPlaceholderTextFG: Color(hex: 0x7e8386)
-    ))
+    static let light = AiChatTheme(colors: .init())
     
     static let dark = AiChatTheme(colors: .init(
         inputBG: Color(hex: 0x1e1e1e),
