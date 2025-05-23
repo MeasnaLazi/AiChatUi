@@ -9,31 +9,20 @@ import SwiftUI
 import MarkdownUI
 import Splash
 
-public enum MessageType {
-    case you
-    case agent
-}
-
-public struct MessageView: View, Identifiable, Equatable {
+public struct MessageView: View {
     
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.aiChatTheme) private var aiChatTheme
     
-    public let id: UUID = UUID()
-    let text: String
-    let type: MessageType
+    let message: Message
     
     public var body: some View {
-        switch type {
+        switch message.type {
         case .you:
             youView
         case .agent:
             agentView
         }
-    }
-    
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.id == rhs.id
     }
     
     private var theme: Splash.Theme {
@@ -50,7 +39,7 @@ public struct MessageView: View, Identifiable, Equatable {
         HStack {
             Spacer()
             ZStack(alignment: .bottomTrailing) {
-                Text(text)
+                Text(message.text)
                     .foregroundColor(aiChatTheme.colors.youMessageViewFG)
                     .padding(10)
                     .fixedSize(horizontal: false, vertical: true)
@@ -64,7 +53,7 @@ public struct MessageView: View, Identifiable, Equatable {
     @ViewBuilder
     private var agentView: some View {
         HStack {
-            Markdown(text)
+            Markdown(message.text)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .markdownBlockStyle(\.codeBlock) {
                     if $0.language?.lowercased() == "json", let renderView = RenderView(text: $0.content) {

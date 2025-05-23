@@ -6,7 +6,7 @@
 //
 
 class ChatViewModel: BaseChatViewModel {
-    override func sendMessage(content: String, type: ContentType) -> MessageView {
+    override func sendMessage(content: String, type: ContentType) -> Message {
 //        print("My logic!")
         return super.sendMessage(content: content, type: type)
     }

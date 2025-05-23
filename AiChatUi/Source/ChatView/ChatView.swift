@@ -27,23 +27,28 @@ public struct ChatView: View {
             listView
             inputView
         }
-        .animation(.easeInOut, value: viewModel.messageViews)
+        .animation(.easeInOut, value: viewModel.groupMessages)
     }
     
     @ViewBuilder
     private var listView: some View {
         GeometryReader { geoReader in
-            let scrollViewHeight = geoReader.size.height
+            let scrollViewHeight = geoReader.size.height + 50
             ScrollView {
                 VStack(spacing: 10) {
-                    ForEach(viewModel.messageViews, id: \.id) { messageView in
+                    ForEach(viewModel.groupMessages, id: \.id) { groupMessage in
                         VStack {
-                            messageView
-                            Spacer()
-                                .frame(height: messageView.id == viewModel.messageViews.last?.id ? scrollViewHeight : nil)
+                            MessageView(message: groupMessage.you)
+                            ForEach(groupMessage.agents) { message in
+                                MessageView(message: message)
+                            }
                         }
-                        .id(messageView.id)
-                        .padding(.top, messageView.type == MessageType.you ? 16 : 0)
+                        .frame(
+                            minHeight: groupMessage.id == viewModel.groupMessages.last?.id ? scrollViewHeight : nil,
+                            alignment: .top
+                        )
+                        .id(groupMessage.id)
+                        .padding(.top)
                     }
                 }
                 .scrollTargetLayout()

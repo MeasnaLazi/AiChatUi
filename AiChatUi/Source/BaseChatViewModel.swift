@@ -13,28 +13,30 @@ public enum ContentType {
 }
 
 open class BaseChatViewModel : ObservableObject {
-    @Published public var messageViews: [MessageView] = []
+    @Published public var groupMessages: [GroupMessage] = []
     @Published var scrollPositionUUID: UUID? //when send, the message move to top
     
-    open func sendMessage(content: String, type: ContentType) -> MessageView {
-        var messageView: MessageView
+    open func sendMessage(content: String, type: ContentType) -> Message {
+        var message: Message
     
         switch type {
             case .text:
-                messageView = MessageView(text: content.trimmingCharacters(in: .whitespacesAndNewlines), type: .you)
+            message = Message(text: content.trimmingCharacters(in: .whitespacesAndNewlines), type: .you)
             case .file:
-                messageView = MessageView(text: "No support yet!", type: .you)
+            message = Message(text: "No support yet!", type: .you)
         }
-        messageViews.append(messageView)
-        scrollPositionUUID = messageView.id
         
-        return messageView
+        let group = GroupMessage(you: message)
+        groupMessages.append(group)
+        scrollPositionUUID = group.id
+        
+        return message
     }
     
-    open func receiveMessage(text: String) -> MessageView {
-        let messageView = MessageView(text: text, type: .agent )
-        messageViews.append(messageView)
+    open func receiveMessage(text: String) -> Message {
+        let message = Message(text: text, type: .agent)
+        groupMessages[groupMessages.count - 1].agents.append(message)
         
-        return messageView
+        return message
     }
 }
