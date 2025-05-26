@@ -56,6 +56,9 @@ struct ContentView: View {
         .onAppear() {
             RenderViewContext.shared.registerRenderView(model: StayMessageRender.self)
             RenderViewContext.shared.registerRenderView(model: StayTwoMessageRender.self)
+            Task {
+                await chatViewModel.onInitialize()
+            }
         }
     }
 }

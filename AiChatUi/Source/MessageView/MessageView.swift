@@ -92,7 +92,8 @@ public struct MessageView: View {
                     Image(systemName: configuration.isCompleted ? "checkmark.circle.fill" : "circle")
                         .relativeFrame(minWidth: .em(1.5), alignment: .trailing)
                 }
+            Spacer()
         }
-        Spacer()
+        .padding(.top)
     }
 }
