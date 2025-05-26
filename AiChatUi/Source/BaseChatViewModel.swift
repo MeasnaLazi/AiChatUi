@@ -12,6 +12,7 @@ public enum ContentType {
     case file
 }
 
+@MainActor
 open class BaseChatViewModel : ObservableObject {
     @Published public var groupMessages: [GroupMessage] = []
     @Published var scrollPositionUUID: UUID? //when send, the message move to top
@@ -32,6 +33,9 @@ open class BaseChatViewModel : ObservableObject {
     }
     
     open func receiveMessage(text: String) {
+        if text.isEmpty {
+            return
+        }
         let message = Message(text: text, type: .agent)
         groupMessages[groupMessages.count - 1].agents.append(message)
     }

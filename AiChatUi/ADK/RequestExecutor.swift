@@ -7,4 +7,5 @@
 
 protocol RequestExecutor {
     func execute<T: Responable>(_ request: Requestable) async throws -> T
+    func executeStream<T: Responable>( _ request: Requestable) async throws -> AsyncThrowingStream<T, Error>
 }

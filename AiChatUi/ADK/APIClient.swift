@@ -37,7 +37,6 @@ struct APIClient: RequestExecutor {
                 let textData = Data("true".utf8)
                 return try T.decode(textData)
             }
-
 //            print("data: \(String(describing: String(data: data, encoding: .utf8)))")
 
             return try T.decode(data)
@@ -50,7 +49,32 @@ struct APIClient: RequestExecutor {
             throw error
         }
     }
+    
+    func executeStream<T: Responable>(_ request: Requestable) async throws -> AsyncThrowingStream<T, Error> {
+        let urlRequest = createURLRequest(from: request)
 
+        do {
+            let (byteStream, response) = try await session.bytes(for: urlRequest)
+
+            guard let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) else {
+                throw URLError(.badServerResponse)
+            }
+
+            let dataStream = byteStream.dataChunks()
+            return T.decode(from: dataStream)
+            
+        } catch let decodingError as DecodingError {
+            debugPrint("ApiClient decodingError: \(decodingError.localizedDescription)")
+            throw decodingError
+        } catch let urlError as URLError {
+            debugPrint("ApiClient urlError: \(urlError.localizedDescription)")
+            throw urlError
+        } catch {
+            debugPrint("ApiClient error: \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
     private func createURLRequest(from requestable: Requestable) -> URLRequest {
         var url = requestable.requestURL
         if let path = requestable.path {
