@@ -18,12 +18,16 @@ open class BaseChatViewModel : ObservableObject {
     @Published var scrollPositionUUID: UUID? //when send, the message move to top
     
     open func sendMessage(content: String, type: ContentType) {
+        if content.isEmpty {
+            return
+        }
+        
         var message: Message
     
         switch type {
-            case .text:
+        case .text:
             message = Message(text: content.trimmingCharacters(in: .whitespacesAndNewlines), type: .you)
-            case .file:
+        case .file:
             message = Message(text: "No support yet!", type: .you)
         }
         
@@ -32,11 +36,13 @@ open class BaseChatViewModel : ObservableObject {
         scrollPositionUUID = group.id
     }
     
-    open func receiveMessage(text: String) {
+    open func receiveMessage(text: String) -> UUID? {
         if text.isEmpty {
-            return
+            return nil
         }
         let message = Message(text: text, type: .agent)
         groupMessages[groupMessages.count - 1].agents.append(message)
+        
+        return groupMessages[groupMessages.count - 1].id
     }
 }

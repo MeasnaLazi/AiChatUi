@@ -102,3 +102,5 @@ private let _decoder: JSONDecoder = {
 }()
 
 extension Bool: Responable {}
+
+extension Array<Event>: Responable {}

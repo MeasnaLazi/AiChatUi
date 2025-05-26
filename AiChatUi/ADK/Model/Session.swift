@@ -17,6 +17,18 @@ struct Session {
     let state: State
     let events: [Event]
     let lastUpdateTime: Double
+    
+    func buildNewMesssageDictionary(text: String, streaming: Bool = false) -> Dictionary<String, Any> {
+        let part = ["text": text]
+        let parts = [part]
+        let newMessage: [String: Any] = ["role": "user", "parts": parts]
+        let jsonData: [String: Any] = ["app_name": appName,
+                        "user_id" : userId,
+                        "session_id": id,
+                        "streaming": streaming,
+                        "new_message": newMessage]
+        return jsonData
+    }
 }
 
 extension Session: Decodable, Responable {}

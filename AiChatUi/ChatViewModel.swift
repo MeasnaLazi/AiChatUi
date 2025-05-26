@@ -12,11 +12,6 @@ class ChatViewModel: BaseChatViewModel {
     private let runRepository: RunRepository = RunRepositoryImp(requestExecute: APIClient())
     private var session: Session?
     
-    override func sendMessage(content: String, type: ContentType) {
-//        print("My logic!")
-        super.sendMessage(content: content, type: type)
-    }
-    
     func onInitialize() async {
         do {
             let existSesstion = try? await adkRepository.getSession(user: "lazi", session: "lazi_session")
@@ -34,15 +29,38 @@ class ChatViewModel: BaseChatViewModel {
     }
     
     private func extractDataAndSetToList(session: Session) {
+        var lastUUID: UUID?
+        let displayEvents = session.events.filter {$0.content.parts.first?.text != nil}
         
-        for event in session.events {
+        for event in displayEvents {
             let role = event.content.role
             let text = event.content.parts.first!.text ?? ""
             if role == "user" {
                 self.sendMessage(content: text, type: .text)
             } else {
-                self.receiveMessage(text: text)
+                lastUUID = self.receiveMessage(text: text)
             }
+        }
+        if let lastUUID {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
+                self.scrollPositionUUID = lastUUID
+                print("scroll to button: \(lastUUID)")
+            })
+        }
+    }
+    
+    func sendMessageToApiStreaming(content: String) async {
+        guard let session = session else {
+            return
+        }
+        let jsonData = session.buildNewMesssageDictionary(text: content, streaming: true).toData()
+        do {
+            let itemStream = try await runRepository.runSSE(data: jsonData)
+            for try await item in itemStream {
+                let _ = super.receiveMessage(text: item.content.parts.first?.text ?? "")
+            }
+        } catch {
+            debugPrint(error)
         }
     }
     
@@ -50,20 +68,10 @@ class ChatViewModel: BaseChatViewModel {
         guard let session = session else {
             return
         }
-        let part = ["text": content]
-        let parts = [part]
-        let newMessage = ["role": "user",
-                          "parts": parts] as [String : Any]
-        let jsonData = ["app_name": session.appName,
-                        "user_id" : session.userId,
-                        "session_id": session.id,
-                        "streaming": true,
-                        "new_message": newMessage].toData()
+        let jsonData = session.buildNewMesssageDictionary(text: content).toData()
         do {
-            let itemStream = try await runRepository.runSSE(data: jsonData)
-            for try await item in itemStream {
-                super.receiveMessage(text: item.content.parts.first?.text ?? "")
-            }
+            let events = try await runRepository.run(data: jsonData)
+            let _ = super.receiveMessage(text: events.first?.content.parts.first?.text ?? "")
         } catch {
             debugPrint(error)
         }

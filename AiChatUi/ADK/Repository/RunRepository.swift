@@ -9,6 +9,7 @@ import Foundation
 
 protocol RunRepository {
     func runSSE(data: Data) async throws -> AsyncThrowingStream<Event, Error>
+    func run(data: Data) async throws -> [Event]
 }
 
 struct RunRepositoryImp : RunRepository, BaseRepository {
@@ -20,5 +21,9 @@ struct RunRepositoryImp : RunRepository, BaseRepository {
     
     func runSSE(data: Data) async throws -> AsyncThrowingStream<Event, Error> {
         try await executeStream(RunApi.runSSE(data: data))
+    }
+    
+    func run(data: Data) async throws -> [Event] {
+        try await execute(RunApi.run(data: data))
     }
 }

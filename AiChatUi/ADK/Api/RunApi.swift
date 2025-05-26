@@ -15,14 +15,13 @@ enum RunApi : Requestable {
         switch self {
         case .runSSE:
            return "/run_sse"
+        case .run:
+           return "/run"
         }
     }
     
     var httpMethod: HTTPMethod {
-        switch self {
-        case .runSSE:
-           return .post
-        }
+        return .post
     }
     
     var header: [String : String] {
@@ -33,6 +32,8 @@ enum RunApi : Requestable {
         switch self {
         case .runSSE(let data):
             return .body(data)
+        case .run(let data):
+            return .body(data)
         }
     }
     
@@ -41,4 +42,5 @@ enum RunApi : Requestable {
     }
     
     case runSSE(data: Data)
+    case run(data: Data)
 }
