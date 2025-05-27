@@ -64,6 +64,8 @@ public struct AiChatTheme {
         public var codeBlockHeaderBG: Color
         public var codeBlockHeaderFG: Color
         
+        public var thinkingFG: Color
+        
         public init(
             
             youMessageViewBG: Color = Color(hex: 0xf2f2f2),
@@ -82,7 +84,9 @@ public struct AiChatTheme {
             codeBlockHeaderBorder: Color = Color(hex: 0xd7d7d7),
             codeBlockBG: Color = Color(hex: 0xffffff),
             codeBlockHeaderBG: Color = Color(hex: 0xefefef),
-            codeBlockHeaderFG: Color = Color(hex: 0x000000)
+            codeBlockHeaderFG: Color = Color(hex: 0x000000),
+            
+            thinkingFG: Color = Color(hex: 0xAAAAAA)
 
         ) {
             self.youMessageViewBG = youMessageViewBG
@@ -102,6 +106,8 @@ public struct AiChatTheme {
             self.codeBlockBG = codeBlockBG
             self.codeBlockHeaderBG = codeBlockHeaderBG
             self.codeBlockHeaderFG = codeBlockHeaderFG
+            
+            self.thinkingFG = thinkingFG
         }
     }
 }

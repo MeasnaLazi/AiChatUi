@@ -17,11 +17,15 @@ open class BaseChatViewModel : ObservableObject {
     @Published public var groupMessages: [GroupMessage] = []
     @Published var scrollPositionUUID: UUID? //when send, the message move to top
     @Published var isInitMessages: Bool = true
+    @Published var isThinking: Bool = false
     
     open func sendMessage(content: String, type: ContentType) {
         if content.isEmpty {
             return
         }
+        
+        self.isInitMessages = false
+        self.isThinking =  true
         
         var message: Message
     
@@ -31,7 +35,6 @@ open class BaseChatViewModel : ObservableObject {
         case .file:
             message = Message(text: "No support yet!", type: .you)
         }
-        self.isInitMessages = false
         
         let group = GroupMessage(you: message)
         groupMessages.append(group)
@@ -42,6 +45,8 @@ open class BaseChatViewModel : ObservableObject {
         if text.isEmpty {
             return 
         }
+        
+        self.isThinking = false
         
         let message = Message(text: text, type: .agent)
         groupMessages[groupMessages.count - 1].agents.append(message)
@@ -58,5 +63,9 @@ open class BaseChatViewModel : ObservableObject {
                 groupMessages[groupMessages.count - 1].agents.append(message)
             }
         }
+    }
+    
+    func stopThinking() {
+        self.isThinking = false
     }
 }

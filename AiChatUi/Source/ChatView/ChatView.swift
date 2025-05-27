@@ -7,19 +7,26 @@
 
 import SwiftUI
 
+public enum ButtonTapType {
+    case send
+    case voice
+    case stop
+}
+
 public struct ChatView: View {
+    
     @Environment(\.aiChatTheme) private var theme
     @Environment(\.pixelLength) private var pixelLength
     
     @ObservedObject private var viewModel: BaseChatViewModel
     @Binding private var inputText: String
     
-    var onSendClicked: (() -> ())?
+    var onButtonTapped: ((ButtonTapType) -> ())?
     
-    public init(viewModel: BaseChatViewModel, inputText: Binding<String>, onSendClicked: (() -> ())? = nil) {
+    public init(viewModel: BaseChatViewModel, inputText: Binding<String>, onButtonTapped: ((ButtonTapType) -> ())? = nil) {
         self.viewModel = viewModel
         self._inputText =  inputText
-        self.onSendClicked = onSendClicked
+        self.onButtonTapped = onButtonTapped
     }
     
     public var body: some View {
@@ -39,6 +46,10 @@ public struct ChatView: View {
                     ForEach(viewModel.groupMessages, id: \.id) { groupMessage in
                         VStack {
                             MessageView(message: groupMessage.you)
+                            
+                            if viewModel.isThinking && groupMessage.id == viewModel.groupMessages.last?.id {
+                                thinkingView
+                            }
                             ForEach(groupMessage.agents) { message in
                                 MessageView(message: message)
                             }
@@ -68,10 +79,21 @@ public struct ChatView: View {
     }
     
     @ViewBuilder
+    private var thinkingView: some View {
+        HStack {
+            ProgressView()
+            Text("Thinking")
+                .font(.system(size: 15).italic())
+                .foregroundStyle(theme.colors.thinkingFG)
+            Spacer()
+        }
+    }
+    
+    @ViewBuilder
     private var inputView: some View {
         VStack {
             CustomTextEditor(text: $inputText) {
-                onSendClick()
+                onButtonClick(tapType: .send)
             }
             .padding([.leading, .trailing], 12)
             .padding(.top, 10)
@@ -92,21 +114,38 @@ public struct ChatView: View {
                 Spacer()
                 
                 Button(action: {
-                  onSendClick()
-                }) {
-                    if inputText.isEmpty {
-                        Image(systemName: "waveform" )
-                            .font(.system(size: 16))
-                            .foregroundColor(theme.colors.inputButtonIconFG)
+                    if viewModel.isThinking {
+                        viewModel.stopThinking()
+                        onButtonClick(tapType: .stop)
                     } else {
-                        Image(systemName: "arrow.up")
+                        if inputText.isEmpty {
+                            onButtonClick(tapType: .voice)
+                        } else {
+                            onButtonClick(tapType: .send)
+                        }
+                    }
+                }) {
+                    if viewModel.isThinking {
+                        Image(systemName: "stop.fill")
                             .font(.system(size: 14))
                             .padding(6)
                             .background(theme.colors.inputSendButtonIconBG)
                             .foregroundColor(theme.colors.inputSendButtonIconFG)
                             .clipShape(Circle())
+                    } else {
+                        if inputText.isEmpty {
+                            Image(systemName: "waveform" )
+                                .font(.system(size: 16))
+                                .foregroundColor(theme.colors.inputButtonIconFG)
+                        } else {
+                            Image(systemName: "arrow.up")
+                                .font(.system(size: 14))
+                                .padding(6)
+                                .background(theme.colors.inputSendButtonIconBG)
+                                .foregroundColor(theme.colors.inputSendButtonIconFG)
+                                .clipShape(Circle())
+                        }
                     }
-      
                 }
             }
             .padding([.leading, .trailing], 12)
@@ -118,9 +157,9 @@ public struct ChatView: View {
         .padding([.leading, .trailing], 12)
     }
     
-    private func onSendClick() {
-        if !inputText.isEmpty, let onSendClicked {
-            onSendClicked()
+    private func onButtonClick(tapType: ButtonTapType) {
+        if !inputText.isEmpty, let onButtonTapped {
+            onButtonTapped(tapType)
         }
     }
 }
