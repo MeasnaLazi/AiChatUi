@@ -85,7 +85,7 @@ public struct MessageView: View {
                         .shadow(radius: 8, y: 8)
                         .markdownMargin(top: .em(1.6), bottom: .em(1.6))
                 }
-    //            .markdownImageProvider(.webImage)
+//                .markdownImageProvider(.webImage)
                 .markdownBulletedListMarker(.dash)
                 .markdownNumberedListMarker(.lowerRoman)
                 .markdownBlockStyle(\.taskListMarker) { configuration in

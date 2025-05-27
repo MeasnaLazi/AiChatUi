@@ -29,24 +29,17 @@ class ChatViewModel: BaseChatViewModel {
     }
     
     private func extractDataAndSetToList(session: Session) {
-        var lastUUID: UUID?
         let displayEvents = session.events.filter {$0.content.parts.first?.text != nil}
-        
-        for event in displayEvents {
-            let role = event.content.role
-            let text = event.content.parts.first!.text ?? ""
-            if role == "user" {
-                self.sendMessage(content: text, type: .text)
+        let messages = displayEvents.map {
+            let text = $0.content.parts.first!.text!
+            if $0.content.role == "user" {
+                return Message(text: text, type: .you)
             } else {
-                lastUUID = self.receiveMessage(text: text)
+                return Message(text: text, type: .agent)
             }
         }
-        if let lastUUID {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
-                self.scrollPositionUUID = lastUUID
-                print("scroll to button: \(lastUUID)")
-            })
-        }
+    
+        super.initExistMessages(messages: messages)
     }
     
     func sendMessageToApiStreaming(content: String) async {
@@ -57,7 +50,7 @@ class ChatViewModel: BaseChatViewModel {
         do {
             let itemStream = try await runRepository.runSSE(data: jsonData)
             for try await item in itemStream {
-                let _ = super.receiveMessage(text: item.content.parts.first?.text ?? "")
+                super.receiveMessage(text: item.content.parts.first?.text ?? "")
             }
         } catch {
             debugPrint(error)
@@ -71,7 +64,11 @@ class ChatViewModel: BaseChatViewModel {
         let jsonData = session.buildNewMesssageDictionary(text: content).toData()
         do {
             let events = try await runRepository.run(data: jsonData)
-            let _ = super.receiveMessage(text: events.first?.content.parts.first?.text ?? "")
+            print("events: \(events.count)")
+            for event in events {
+                super.receiveMessage(text: event.content.parts.first?.text ?? "")
+            }
+            
         } catch {
             debugPrint(error)
         }

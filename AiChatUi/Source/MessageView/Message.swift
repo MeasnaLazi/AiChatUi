@@ -13,7 +13,7 @@ public enum MessageType {
 
 public struct Message: Identifiable {
     public let id = UUID()
-    let text: String
+    var text: String
     let type: MessageType
 }
 

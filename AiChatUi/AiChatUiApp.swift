@@ -6,9 +6,16 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 @main
 struct AiChatUiApp: App {
+    
+    init() {
+          SDWebImageDownloader.shared.config.downloadTimeout = 60
+      }
+
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

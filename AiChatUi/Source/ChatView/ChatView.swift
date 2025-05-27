@@ -44,7 +44,7 @@ public struct ChatView: View {
                             }
                         }
                         .frame(
-                            minHeight: groupMessage.id == viewModel.groupMessages.last?.id ? scrollViewHeight : nil,
+                            minHeight: (groupMessage.id == viewModel.groupMessages.last?.id && !viewModel.isInitMessages) ? scrollViewHeight : nil,
                             alignment: .top
                         )
                         .id(groupMessage.id)
@@ -54,7 +54,15 @@ public struct ChatView: View {
                 .scrollTargetLayout()
                 .padding(.horizontal)
             }
-            .scrollPosition(id: $viewModel.scrollPositionUUID, anchor: .top)
+            .scrollPosition(id: $viewModel.scrollPositionUUID, anchor: viewModel.isInitMessages ? .bottom : .top)
+            .onChange(of: viewModel.groupMessages) {
+                let WAIT_VIEW_RENDER = 1.0
+                if let lastMessageId = viewModel.groupMessages.last?.id {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + WAIT_VIEW_RENDER) {
+                        viewModel.scrollPositionUUID = lastMessageId
+                    }
+                }
+            }
         }
         .padding(.top, pixelLength)
     }

@@ -16,6 +16,7 @@ public enum ContentType {
 open class BaseChatViewModel : ObservableObject {
     @Published public var groupMessages: [GroupMessage] = []
     @Published var scrollPositionUUID: UUID? //when send, the message move to top
+    @Published var isInitMessages: Bool = true
     
     open func sendMessage(content: String, type: ContentType) {
         if content.isEmpty {
@@ -30,19 +31,32 @@ open class BaseChatViewModel : ObservableObject {
         case .file:
             message = Message(text: "No support yet!", type: .you)
         }
+        self.isInitMessages = false
         
         let group = GroupMessage(you: message)
         groupMessages.append(group)
         scrollPositionUUID = group.id
     }
     
-    open func receiveMessage(text: String) -> UUID? {
+    open func receiveMessage(text: String) {
         if text.isEmpty {
-            return nil
+            return 
         }
+        
         let message = Message(text: text, type: .agent)
         groupMessages[groupMessages.count - 1].agents.append(message)
+    }
+    
+    func initExistMessages(messages: [Message]) {
+        groupMessages.removeAll()
         
-        return groupMessages[groupMessages.count - 1].id
+        for message in messages {
+            if message.type == .you {
+                let group = GroupMessage(you: message)
+                groupMessages.append(group)
+            } else {
+                groupMessages[groupMessages.count - 1].agents.append(message)
+            }
+        }
     }
 }

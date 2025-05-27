@@ -27,10 +27,13 @@ struct ContentView: View {
                 Task {
                     await chatViewModel.sendMessageToApi(content: text)
                 }
+                
 //                let temText = inputText
 //                inputText = ""
 //                
 //                var end = ""
+//                
+//                chatViewModel.sendMessage(content: temText, type: .text)
 //                
 //                if temText.lowercased().contains("code") {
 //                    end = "code"
@@ -61,7 +64,7 @@ struct ContentView: View {
         }
         .onAppear() {
             RenderViewContext.shared.registerRenderView(model: StayMessageRender.self)
-            RenderViewContext.shared.registerRenderView(model: StayTwoMessageRender.self)
+            RenderViewContext.shared.registerRenderView(model: AirbnbRenderView.self)
             Task {
                 await chatViewModel.onInitialize()
             }

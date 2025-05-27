@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		550CD5712DE538AC00A3A8E2 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 550CD5702DE538AC00A3A8E2 /* SDWebImageSwiftUI */; };
 		5540B3992DD4051C00E6F00A /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5540B3982DD4051C00E6F00A /* MarkdownUI */; };
 		5540B39F2DD407FA00E6F00A /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 5540B39E2DD407FA00E6F00A /* Markdown */; };
 		55B341262DD5577F00950641 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 55B341252DD5577F00950641 /* Splash */; };
@@ -66,6 +67,7 @@
 				5540B3992DD4051C00E6F00A /* MarkdownUI in Frameworks */,
 				5540B39F2DD407FA00E6F00A /* Markdown in Frameworks */,
 				55B341262DD5577F00950641 /* Splash in Frameworks */,
+				550CD5712DE538AC00A3A8E2 /* SDWebImageSwiftUI in Frameworks */,
 				55B341282DD5577F00950641 /* SplashHTMLGen in Frameworks */,
 				55B3412C2DD5577F00950641 /* SplashMarkdown in Frameworks */,
 				55B3412A2DD5577F00950641 /* SplashImageGen in Frameworks */,
@@ -136,6 +138,7 @@
 				55B341292DD5577F00950641 /* SplashImageGen */,
 				55B3412B2DD5577F00950641 /* SplashMarkdown */,
 				55B3412D2DD5577F00950641 /* SplashTokenizer */,
+				550CD5702DE538AC00A3A8E2 /* SDWebImageSwiftUI */,
 			);
 			productName = AiChatUi;
 			productReference = 5511AA152DBF07DA00289625 /* AiChatUi.app */;
@@ -223,6 +226,7 @@
 				5540B3972DD4051C00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				5540B39D2DD407FA00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown" */,
 				55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */,
+				550CD56F2DE538AC00A3A8E2 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5511AA162DBF07DA00289625 /* Products */;
@@ -581,6 +585,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		550CD56F2DE538AC00A3A8E2 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.3;
+			};
+		};
 		5540B3972DD4051C00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui?tab=readme-ov-file#installation";
@@ -608,6 +620,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		550CD5702DE538AC00A3A8E2 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 550CD56F2DE538AC00A3A8E2 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
 		5540B3982DD4051C00E6F00A /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5540B3972DD4051C00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
