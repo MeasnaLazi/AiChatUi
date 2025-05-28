@@ -42,6 +42,7 @@ struct Event {
     let id: String
     let timestamp: Double
     let usageMetadata: UsageMetadata?
+    let partial: Bool?
     
     struct Action {
         typealias ActionItem = [String: Dynamic]
@@ -55,11 +56,11 @@ extension Event: Decodable, Responable {}
 extension Event.Action: Decodable, Responable {}
 
 struct UsageMetadata {
-    let candidatesTokenCount: Int
-    let candidatesTokensDetails: [TokenDetail]
-    let promptTokenCount: Int
-    let promptTokensDetails: [TokenDetail]
-    let totalTokenCount: Int
+    let candidatesTokenCount: Int?
+    let candidatesTokensDetails: [TokenDetail]?
+    let promptTokenCount: Int?
+    let promptTokensDetails: [TokenDetail]?
+    let totalTokenCount: Int?
     
     struct TokenDetail {
         let modality: String

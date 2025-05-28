@@ -18,43 +18,44 @@ struct ContentView: View {
     }
     
     private func onSend() {
-//        let text = inputText
-//        inputText = ""
-//        
-//        chatViewModel.sendMessage(content: text, type: .text)
-//        Task {
-//            await chatViewModel.sendMessageToApi(content: text)
-//        }
+        let text = inputText
+        inputText = ""
         
-                let temText = inputText
-                inputText = ""
-
-                var end = ""
-
-                chatViewModel.sendMessage(content: temText, type: .text)
-
-                if temText.lowercased().contains("code") {
-                    end = "code"
-                } else if temText.lowercased().contains("room") {
-                    end = "stay"
-                }
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 10.5) {
-                    if end == "" {
-                        let _ = chatViewModel.receiveMessage(text: "Hold on!")
-                        return
-                    }
-                    if let url = Bundle.main.url(forResource: "response_\(end)", withExtension: "json") {
-                            do {
-                                let data = try Data(contentsOf: url)
-                                let decoder = JSONDecoder()
-                                let jsonData = try decoder.decode(Response.self, from: data)
-                                let _ = chatViewModel.receiveMessage(text: jsonData.content)
-                            } catch {
-                                print("error:\(error)")
-                            }
-                        }
-                }
+        chatViewModel.sendMessage(content: text, type: .text)
+        Task {
+//            await chatViewModel.sendMessageToApi(content: text)
+            await chatViewModel.sendMessageToApiStreaming(content: text)
+        }
+        
+//                let temText = inputText
+//                inputText = ""
+//
+//                var end = ""
+//
+//                chatViewModel.sendMessage(content: temText, type: .text)
+//
+//                if temText.lowercased().contains("code") {
+//                    end = "code"
+//                } else if temText.lowercased().contains("room") {
+//                    end = "stay"
+//                }
+//
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 10.5) {
+//                    if end == "" {
+//                        let _ = chatViewModel.receiveMessage(text: "Hold on!")
+//                        return
+//                    }
+//                    if let url = Bundle.main.url(forResource: "response_\(end)", withExtension: "json") {
+//                            do {
+//                                let data = try Data(contentsOf: url)
+//                                let decoder = JSONDecoder()
+//                                let jsonData = try decoder.decode(Response.self, from: data)
+//                                let _ = chatViewModel.receiveMessage(text: jsonData.content)
+//                            } catch {
+//                                print("error:\(error)")
+//                            }
+//                        }
+//                }
     }
     
     var body: some View {

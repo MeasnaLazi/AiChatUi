@@ -46,10 +46,30 @@ open class BaseChatViewModel : ObservableObject {
             return 
         }
         
-        self.isThinking = false
+        self.stopThinking()
         
         let message = Message(text: text, type: .agent)
         groupMessages[groupMessages.count - 1].agents.append(message)
+    }
+    
+    open func receiveMessageStream(text: String, isPartial: Bool) {
+        if text.isEmpty {
+            return
+        }
+        
+        let existMessages = groupMessages[groupMessages.count - 1].agents
+        
+        if !isPartial {
+//            groupMessages[groupMessages.count - 1].agents[existMessages.count - 1].text = text
+            return
+        }
+        
+        if existMessages.isEmpty {
+            let message = Message(text: text, type: .agent)
+            groupMessages[groupMessages.count - 1].agents.append(message)
+        } else {
+            groupMessages[groupMessages.count - 1].agents[existMessages.count - 1].text.append(text)
+        }
     }
     
     func initExistMessages(messages: [Message]) {

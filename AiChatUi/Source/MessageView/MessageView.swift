@@ -56,6 +56,7 @@ public struct MessageView: View {
             Markdown(message.text)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .markdownBlockStyle(\.codeBlock) {
+                    let _  = print($0.language ?? "")
                     if $0.language?.lowercased() == "json", let renderView = RenderView(text: $0.content) {
                         renderView
                     } else {

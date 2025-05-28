@@ -49,12 +49,20 @@ class ChatViewModel: BaseChatViewModel {
         let jsonData = session.buildNewMesssageDictionary(text: content, streaming: true).toData()
         do {
             let itemStream = try await runRepository.runSSE(data: jsonData)
+            var count = 0
             for try await item in itemStream {
-                super.receiveMessage(text: item.content.parts.first?.text ?? "")
+                count += 1
+                let text = item.content.parts.first?.text ?? ""
+                let isPartial = item.partial ?? false
+                super.receiveMessageStream(text: text, isPartial: isPartial)
             }
+            print("stream count: \(count)")
+            print("agents count: \(groupMessages.last?.agents.count ?? 0)")
+            stopThinking()
         } catch {
             debugPrint(error)
         }
+  
     }
     
     func sendMessageToApi(content: String) async {
