@@ -42,6 +42,10 @@ struct ImageRowView: View {
                         } placeholder: {
                             Rectangle().foregroundColor(.gray)
                         }
+                        .onFailure { error in
+                            print("Image failed to load: \(imageURLs[0])")
+                        }
+                        .retryOnAppear(true)
                         .indicator(.activity)
                         .transition(.fade(duration: 0.5))
                         .scaledToFill()
@@ -59,6 +63,9 @@ struct ImageRowView: View {
                             } placeholder: {
                                 Rectangle().foregroundColor(.gray)
                             }
+                            .onFailure { error in
+                                print("Image failed to load: \(imageURLs[1])")
+                            }
                             .indicator(.activity)
                             .transition(.fade(duration: 0.5))
                             .scaledToFill()
@@ -73,6 +80,9 @@ struct ImageRowView: View {
                                     image.resizable()
                                 } placeholder: {
                                     Rectangle().foregroundColor(.gray)
+                                }
+                                .onFailure { error in
+                                    print("Image failed to load: \(imageURLs[2])")
                                 }
                                 .indicator(.activity)
                                 .transition(.fade(duration: 0.5))

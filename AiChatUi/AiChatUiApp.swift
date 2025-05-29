@@ -10,10 +10,12 @@ import SDWebImageSwiftUI
 
 @main
 struct AiChatUiApp: App {
-    
-    init() {
-          SDWebImageDownloader.shared.config.downloadTimeout = 60
-      }
+
+//    init() {
+//        SDWebImageDownloader.shared.config.downloadTimeout = 60
+//        SDImageCache.shared.clearMemory()
+//        SDImageCache.shared.clearDisk(onCompletion: nil)
+//    }
 
     
     var body: some Scene {

@@ -54,6 +54,7 @@ class ChatViewModel: BaseChatViewModel {
                 count += 1
                 let text = item.content.parts.first?.text ?? ""
                 let isPartial = item.partial ?? false
+                print("== receive text: \(text)")
                 super.receiveMessageStream(text: text, isPartial: isPartial)
             }
             print("stream count: \(count)")
