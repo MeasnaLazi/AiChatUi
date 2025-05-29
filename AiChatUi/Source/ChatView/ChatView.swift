@@ -47,8 +47,8 @@ public struct ChatView: View {
                         VStack {
                             MessageView(message: groupMessage.you)
                             
-                            if viewModel.isThinking && groupMessage.id == viewModel.groupMessages.last?.id {
-                                thinkingView
+                            if viewModel.isAnswering && groupMessage.id == viewModel.groupMessages.last?.id {
+                                answeringView
                             }
                             ForEach(groupMessage.agents) { message in
                                 MessageView(message: message)
@@ -79,10 +79,10 @@ public struct ChatView: View {
     }
     
     @ViewBuilder
-    private var thinkingView: some View {
+    private var answeringView: some View {
         HStack {
             ProgressView()
-            Text("Thinking")
+            Text("Answering...")
                 .font(.system(size: 15).italic())
                 .foregroundStyle(theme.colors.thinkingFG)
             Spacer()
@@ -114,7 +114,7 @@ public struct ChatView: View {
                 Spacer()
                 
                 Button(action: {
-                    if viewModel.isThinking {
+                    if viewModel.isAnswering {
                         viewModel.stopThinking()
                         onButtonClick(tapType: .stop)
                     } else {
@@ -125,7 +125,7 @@ public struct ChatView: View {
                         }
                     }
                 }) {
-                    if viewModel.isThinking {
+                    if viewModel.isAnswering {
                         Image(systemName: "stop.fill")
                             .font(.system(size: 14))
                             .padding(6)

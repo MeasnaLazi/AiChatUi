@@ -17,7 +17,7 @@ open class BaseChatViewModel : ObservableObject {
     @Published public var groupMessages: [GroupMessage] = []
     @Published var scrollPositionUUID: UUID? //when send, the message move to top
     @Published var isInitMessages: Bool = true
-    @Published var isThinking: Bool = false
+    @Published var isAnswering: Bool = false
     
     open func sendMessage(content: String, type: ContentType) {
         if content.isEmpty {
@@ -25,7 +25,7 @@ open class BaseChatViewModel : ObservableObject {
         }
         
         self.isInitMessages = false
-        self.isThinking =  true
+        self.isAnswering =  true
         
         var message: Message
     
@@ -57,12 +57,12 @@ open class BaseChatViewModel : ObservableObject {
             return
         }
         
-        let existMessages = groupMessages[groupMessages.count - 1].agents
-        
         if !isPartial {
 //            groupMessages[groupMessages.count - 1].agents[existMessages.count - 1].text = text
             return
         }
+        
+        let existMessages = groupMessages[groupMessages.count - 1].agents
         
         if existMessages.isEmpty {
             let message = Message(text: text, type: .agent)
@@ -86,6 +86,6 @@ open class BaseChatViewModel : ObservableObject {
     }
     
     func stopThinking() {
-        self.isThinking = false
+        self.isAnswering = false
     }
 }

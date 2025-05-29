@@ -14,8 +14,6 @@ struct RenderView: View {
             return nil
         }
         
-//        print("text:\(text)")
-        
         let decoder = JSONDecoder()
         
         guard let modelRender = try? decoder.decode(Render.self, from: data) else {
