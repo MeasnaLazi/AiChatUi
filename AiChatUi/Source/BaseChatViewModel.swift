@@ -46,7 +46,7 @@ open class BaseChatViewModel : ObservableObject {
             return 
         }
         
-        self.stopThinking()
+        self.stopAnswering()
         
         let message = Message(text: text, type: .agent)
         groupMessages[groupMessages.count - 1].agents.append(message)
@@ -85,7 +85,7 @@ open class BaseChatViewModel : ObservableObject {
         }
     }
     
-    func stopThinking() {
+    func stopAnswering() {
         self.isAnswering = false
     }
 }

@@ -11,6 +11,7 @@ class ChatViewModel: BaseChatViewModel {
     private let adkRepository: AdkRepository = AdkRepositoryImp(requestExecute: APIClient())
     private let runRepository: RunRepository = RunRepositoryImp(requestExecute: APIClient())
     private var session: Session?
+    var streamTask: Task<Void, Never>? = nil
     
     func onInitialize() async {
         do {
@@ -32,6 +33,7 @@ class ChatViewModel: BaseChatViewModel {
         let displayEvents = session.events.filter {$0.content.parts.first?.text != nil}
         let messages = displayEvents.map {
             let text = $0.content.parts.first!.text!
+            
             if $0.content.role == "user" {
                 return Message(text: text, type: .you)
             } else {
@@ -47,22 +49,24 @@ class ChatViewModel: BaseChatViewModel {
             return
         }
         let jsonData = session.buildNewMesssageDictionary(text: content, streaming: true).toData()
-        do {
-            let itemStream = try await runRepository.runSSE(data: jsonData)
-            var count = 0
-            for try await item in itemStream {
-                count += 1
-                let text = item.content.parts.first?.text ?? ""
-                let isPartial = item.partial ?? false
-                super.receiveMessageStream(text: text, isPartial: isPartial)
+        streamTask = Task {
+            do {
+                let itemStream = try await runRepository.runSSE(data: jsonData)
+                var count = 0
+                
+                for try await item in itemStream {
+                    count += 1
+                    let text = item.content.parts.first?.text ?? ""
+                    let isPartial = item.partial ?? false
+                    super.receiveMessageStream(text: text, isPartial: isPartial)
+                }
+                print("stream count: \(count)")
+                print("agents count: \(groupMessages.last?.agents.count ?? 0)")
+                stopAnswering()
+            } catch {
+                debugPrint(error)
             }
-            print("stream count: \(count)")
-            print("agents count: \(groupMessages.last?.agents.count ?? 0)")
-            stopThinking()
-        } catch {
-            debugPrint(error)
         }
-  
     }
     
     func sendMessageToApi(content: String) async {
@@ -80,5 +84,16 @@ class ChatViewModel: BaseChatViewModel {
         } catch {
             debugPrint(error)
         }
+    }
+    
+    override func stopAnswering() {
+        super.stopAnswering()
+        streamTask?.cancel()
+        streamTask = nil
+    }
+    
+    deinit {
+        streamTask?.cancel()
+        streamTask = nil
     }
 }

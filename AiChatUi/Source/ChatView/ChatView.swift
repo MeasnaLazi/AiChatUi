@@ -115,7 +115,7 @@ public struct ChatView: View {
                 
                 Button(action: {
                     if viewModel.isAnswering {
-                        viewModel.stopThinking()
+                        viewModel.stopAnswering()
                         onButtonClick(tapType: .stop)
                     } else {
                         if inputText.isEmpty {

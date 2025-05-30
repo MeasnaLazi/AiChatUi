@@ -68,6 +68,7 @@ struct ContentView: View {
                     print("TODO: Voice")
                 case .stop:
                     print("TODO: Stop")
+                    chatViewModel.stopAnswering()
                 }
             }
             .aiChatTheme(aiChattheme)

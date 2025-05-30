@@ -15,6 +15,7 @@ struct APIClient: RequestExecutor {
         case decodingError(Error)
         case streamProcessingError
         case apiError(String)
+        case userCancelledStream
     }
     
     private let session: URLSession
@@ -63,56 +64,87 @@ struct APIClient: RequestExecutor {
         let urlRequest = createURLRequest(from: request)
         
         return AsyncThrowingStream { continuation in
-                    Task {
-                        do {
-                            let (bytes, response) = try await URLSession.shared.bytes(for: urlRequest)
-                            
-                            guard let httpResponse = response as? HTTPURLResponse else {
-                                throw APIError.invalidResponse
+            let networkTask = Task {
+                
+                do {
+                    let (bytes, response) = try await URLSession.shared.bytes(for: urlRequest)
+                    
+                    guard let httpResponse = response as? HTTPURLResponse else {
+                        throw APIError.invalidResponse
+                    }
+                    
+                    if !(200..<300).contains(httpResponse.statusCode) {
+                        var errorDataString = "No error data."
+                        var errorBody: Data?
+                        
+                        for try await byte in bytes {
+                            if Task.isCancelled {
+                                print("Tasl streaming cancelled.")
+                                throw APIError.userCancelledStream
                             }
+                            if errorBody == nil {
+                                errorBody = Data()
+                            }
+                            errorBody?.append(byte)
+                        }
+                        
+                        if let data = errorBody {
+                            errorDataString = String(data: data, encoding: .utf8) ?? "Could not decode error body."
+                        }
+                        
+                        continuation.finish(throwing: APIError.requestFailed("Invalid response status: \( (response as? HTTPURLResponse)?.statusCode ?? 0 ). Body: \(errorDataString)"))
+                        
+                        return
+                    }
+                    
+                    for try await line in bytes.lines {
+                        if Task.isCancelled {
+                            print("Tasl streaming cancelled.")
+                            throw APIError.userCancelledStream
+                        }
+                        
+                        if line.hasPrefix("data: ") {
+                            let dataString = String(line.dropFirst(6)) // Remove "data: "
                             
-                            if !(200..<300).contains(httpResponse.statusCode) {
-                                var errorDataString = "No error data."
-                                var errorBody: Data?
-                                
-                                for try await byte in bytes {
-                                    if errorBody == nil { errorBody = Data() }
-                                    errorBody?.append(byte)
-                                }
-                                
-                                if let data = errorBody {
-                                    errorDataString = String(data: data, encoding: .utf8) ?? "Could not decode error body."
-                                }
-                                continuation.finish(throwing: APIError.requestFailed("Invalid response status: \( (response as? HTTPURLResponse)?.statusCode ?? 0 ). Body: \(errorDataString)"))
+                            if dataString == "[DONE]" {
+                                continuation.finish()
                                 return
                             }
-
-                            for try await line in bytes.lines {
-                                if line.hasPrefix("data: ") {
-                                    let dataString = String(line.dropFirst(6)) // Remove "data: "
-                                    if dataString == "[DONE]" {
-                                        continuation.finish()
-                                        return
-                                    }
-                                    guard let jsonData = dataString.data(using: .utf8) else {
-                                        print("Warning: Could not convert string to data: \(dataString)")
-                                        continue
-                                    }
-//                                    print("dataString: \(dataString)")
-                                    do {
-                                        let streamResponse = try T.decode(jsonData)
-                                        continuation.yield(streamResponse)
-                                    } catch {
-                                        print("Warning: Decoding stream chunk failed: \(error). Chunk: \(dataString)")
-                                    }
-                                }
+                            
+                            guard let jsonData = dataString.data(using: .utf8) else {
+                                print("Warning: Could not convert string to data: \(dataString)")
+                                continue
                             }
-                            continuation.finish()
-                        } catch {
-                            continuation.finish(throwing: APIError.streamProcessingError)
+      
+                            do {
+                                let streamResponse = try T.decode(jsonData)
+                                continuation.yield(streamResponse)
+                            } catch {
+                                print("Warning: Decoding stream chunk failed: \(error). Chunk: \(dataString)")
+                            }
                         }
                     }
+                    
+                    continuation.finish()
+                    
+                } catch is CancellationError {
+                    print("Catch: Streaming cancelled.")
+                    continuation.finish(throwing: APIError.userCancelledStream)
                 }
+                catch APIError.userCancelledStream  {
+                    print("Catch: APIError.userCancelledStream.")
+                    continuation.finish(throwing: APIError.userCancelledStream)
+                }
+                catch {
+                    continuation.finish(throwing: APIError.streamProcessingError)
+                }
+            }
+            
+            continuation.onTermination = { _ in
+                print("Network streaming terminate. Cancel network task.")
+                networkTask.cancel()
+            }
+        }
     }
     
     private func createURLRequest(from requestable: Requestable) -> URLRequest {
