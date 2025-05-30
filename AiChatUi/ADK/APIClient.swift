@@ -140,9 +140,16 @@ struct APIClient: RequestExecutor {
                 }
             }
             
-            continuation.onTermination = { _ in
-                print("Network streaming terminate. Cancel network task.")
-                networkTask.cancel()
+            continuation.onTermination = { termination in
+                switch termination {
+                case .cancelled:
+                    print("Stream was cancelled by the user")
+                    networkTask.cancel()
+                case .finished:
+                    print("Stream finished normally")
+                @unknown default:
+                    print("Unknown termination")
+                }
             }
         }
     }

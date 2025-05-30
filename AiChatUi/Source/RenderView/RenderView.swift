@@ -15,12 +15,16 @@ struct RenderView: View {
         }
         
         let decoder = JSONDecoder()
-        
-        guard let modelRender = try? decoder.decode(Render.self, from: data) else {
+    
+        do {
+            let modelRenderr = try decoder.decode(Render.self, from: data)
+            self.renderView = AnyView(modelRenderr.content)
+            
+        } catch {
+//            print("decode error: \(error.localizedDescription)")
+//            print("data: \(text)")
             return nil
         }
-        
-        self.renderView = AnyView(modelRender.content)
     }
     
     var body: some View {
