@@ -15,6 +15,7 @@
 		55B3412A2DD5577F00950641 /* SplashImageGen in Frameworks */ = {isa = PBXBuildFile; productRef = 55B341292DD5577F00950641 /* SplashImageGen */; };
 		55B3412C2DD5577F00950641 /* SplashMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = 55B3412B2DD5577F00950641 /* SplashMarkdown */; };
 		55B3412E2DD5577F00950641 /* SplashTokenizer in Frameworks */ = {isa = PBXBuildFile; productRef = 55B3412D2DD5577F00950641 /* SplashTokenizer */; };
+		55CDF9A62DEBC0C100838FF9 /* SKPhotoBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = 55CDF9A52DEBC0C100838FF9 /* SKPhotoBrowser */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +84,7 @@
 				550CD5712DE538AC00A3A8E2 /* SDWebImageSwiftUI in Frameworks */,
 				55B341282DD5577F00950641 /* SplashHTMLGen in Frameworks */,
 				55B3412C2DD5577F00950641 /* SplashMarkdown in Frameworks */,
+				55CDF9A62DEBC0C100838FF9 /* SKPhotoBrowser in Frameworks */,
 				55B3412A2DD5577F00950641 /* SplashImageGen in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -152,6 +154,7 @@
 				55B3412B2DD5577F00950641 /* SplashMarkdown */,
 				55B3412D2DD5577F00950641 /* SplashTokenizer */,
 				550CD5702DE538AC00A3A8E2 /* SDWebImageSwiftUI */,
+				55CDF9A52DEBC0C100838FF9 /* SKPhotoBrowser */,
 			);
 			productName = AiChatUi;
 			productReference = 5511AA152DBF07DA00289625 /* AiChatUi.app */;
@@ -240,6 +243,7 @@
 				5540B39D2DD407FA00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown" */,
 				55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */,
 				550CD56F2DE538AC00A3A8E2 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				55CDF9A42DEBC0C100838FF9 /* XCRemoteSwiftPackageReference "SKPhotoBrowser" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5511AA162DBF07DA00289625 /* Products */;
@@ -632,6 +636,14 @@
 				minimumVersion = 0.16.0;
 			};
 		};
+		55CDF9A42DEBC0C100838FF9 /* XCRemoteSwiftPackageReference "SKPhotoBrowser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/suzuki-0000/SKPhotoBrowser";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -674,6 +686,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */;
 			productName = SplashTokenizer;
+		};
+		55CDF9A52DEBC0C100838FF9 /* SKPhotoBrowser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55CDF9A42DEBC0C100838FF9 /* XCRemoteSwiftPackageReference "SKPhotoBrowser" */;
+			productName = SKPhotoBrowser;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

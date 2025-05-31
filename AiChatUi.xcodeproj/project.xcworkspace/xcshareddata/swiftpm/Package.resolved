@@ -1,5 +1,5 @@
 {
-  "originHash" : "40f2c8c565fe05abdf88a2146cc16cfeaf3bcf215e30137ad1487b05398860b2",
+  "originHash" : "bc52bb8329f2ba7d06cb641b6b93124a04732a0e4e521d82abe71b0d812a8c2f",
   "pins" : [
     {
       "identity" : "networkimage",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "451c6dfd5ecec2cf626d1d9ca81c2d4a60355172",
         "version" : "3.1.3"
+      }
+    },
+    {
+      "identity" : "skphotobrowser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/suzuki-0000/SKPhotoBrowser",
+      "state" : {
+        "revision" : "f9d8589310ad935270c2b24b3f97c5a89970aff5",
+        "version" : "7.1.0"
       }
     },
     {
