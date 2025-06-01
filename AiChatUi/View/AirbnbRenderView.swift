@@ -53,9 +53,9 @@ struct ImageRowView: View {
 
                     // Bottom 25%
                     if imageURLs.indices.contains(2) {
-                        
                         ZStack {
                             imageView(index: 2, width: totalWidth * 0.25, height: HEIGHT/2 - (SPACE/2))
+                            
                             if imageURLs.count - 3 > 0 {
                                 Color.black.opacity(0.5)
                                 Text("+\(imageURLs.count - 3)")
@@ -65,6 +65,10 @@ struct ImageRowView: View {
                         }
                         .frame(width: totalWidth * 0.25, height: 100 - (SPACE/2))
                         .clipped()
+                        .onTapGesture {
+                            imageIndex = 2
+                            isDisplayImageViewer.toggle()
+                        }
                     }
                 }
             }
@@ -72,8 +76,6 @@ struct ImageRowView: View {
         }
         .frame(height: HEIGHT) // constrain geometry height
         .fullScreenCover(isPresented: $isDisplayImageViewer) {
-//            ImageViewer(imageURLs: imageURLs.map { URL(string: $0.absoluteString.replacingOccurrences(of: "?im_w=720", with: ""))! })
-//            ZoomableImage(url: imageURLs.first!)
             PictureViewer(skPhotos: imageURLs.map { SKPhoto.photoWithImageURL($0.absoluteString.replacingOccurrences(of: "?im_w=720", with: "")) }, currentIndex: imageIndex)
         }
     }

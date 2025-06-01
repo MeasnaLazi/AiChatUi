@@ -42,7 +42,7 @@ public struct ChatView: View {
         GeometryReader { geoReader in
             let scrollViewHeight = geoReader.size.height + 50
             ScrollView {
-                LazyVStack(spacing: 10) {
+                VStack(spacing: 10) {
                     ForEach(viewModel.groupMessages, id: \.id) { groupMessage in
                         VStack {
                             MessageView(message: groupMessage.you)

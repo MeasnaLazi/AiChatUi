@@ -26,6 +26,7 @@ struct PictureViewer: UIViewControllerRepresentable {
         SKPhotoBrowserOptions.displayBackAndForwardButton = false
         SKPhotoBrowserOptions.displayVerticalScrollIndicator = false
         SKPhotoBrowserOptions.displayHorizontalScrollIndicator = false
+        SKPhotoBrowserOptions.displayAction = false
         SKToolbarOptions.textShadowColor = UIColor.clear
         
         let browser = SKPhotoBrowser(photos: skPhotos)

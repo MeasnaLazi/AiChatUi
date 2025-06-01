@@ -116,8 +116,24 @@ extension AiChatTheme {
     static let light = AiChatTheme(colors: .init())
     
     static let dark = AiChatTheme(colors: .init(
-        inputBG: Color(hex: 0x1e1e1e),
-        inputTextFG: Color(hex: 0xffffff),
-        inputPlaceholderTextFG: Color(hex: 0xaaaaaa)
+        youMessageViewBG: Color(hex: 0x212121),
+        youMessageViewFG: Color.white,
+        
+        inputBG: Color(hex: 0x202327),
+        inputTextFG: Color.white,
+        inputPlaceholderTextFG: Color(hex: 0x7d7e80),
+        inputButtonIconFG: Color(hex: 0x91969a),
+        inputButtonIconBG: Color(hex: 0x2b2e32),
+        inputSendButtonIconFG: Color(hex: 0x1e1e1e),
+        inputSendButtonIconBG: Color.white,
+        inputExpandButtonIconFG: Color(hex: 0x99999f),
+        inputCollapeButtonIconFG: Color.white,
+        
+        codeBlockHeaderBorder: Color(hex: 0x202020),
+        codeBlockBG: Color.black,
+        codeBlockHeaderBG: Color(hex: 0x070707),
+        codeBlockHeaderFG: Color(hex: 0xb5b5b4),
+        
+        thinkingFG: Color.white
     ))
 }

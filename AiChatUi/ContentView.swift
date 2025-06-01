@@ -76,8 +76,6 @@ struct ContentView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear() {
-            RenderViewContext.shared.registerRenderView(model: StayMessageRender.self)
-            RenderViewContext.shared.registerRenderView(model: AirbnbRenderView.self)
             Task {
                 await chatViewModel.onInitialize()
             }

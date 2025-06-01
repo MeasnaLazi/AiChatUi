@@ -18,7 +18,8 @@ struct AiChatUiApp: App {
         SDImageCache.shared.config.maxMemoryCost = 50 * 1024 * 1024 // 50 MB
         SDImageCache.shared.config.shouldCacheImagesInMemory = true
         
-        
+        RenderViewContext.shared.registerRenderView(model: StayMessageRender.self)
+        RenderViewContext.shared.registerRenderView(model: AirbnbRenderView.self)
         
 //        SKPhotoBrowserOptions.
 //        SKPhotoBrowserOptions.textAndIconColor = UIColor(Color.black)
