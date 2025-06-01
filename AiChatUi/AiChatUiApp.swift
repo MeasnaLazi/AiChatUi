@@ -7,22 +7,18 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
-import SKPhotoBrowser
 
 @main
 struct AiChatUiApp: App {
 
     init() {
         SDWebImageDownloader.shared.config.downloadTimeout = 60
-        SDWebImageDownloader.shared.config.maxConcurrentDownloads = 4
+        SDWebImageDownloader.shared.config.maxConcurrentDownloads = 6
         SDImageCache.shared.config.maxMemoryCost = 50 * 1024 * 1024 // 50 MB
         SDImageCache.shared.config.shouldCacheImagesInMemory = true
         
         RenderViewContext.shared.registerRenderView(model: StayMessageRender.self)
         RenderViewContext.shared.registerRenderView(model: AirbnbRenderView.self)
-        
-//        SKPhotoBrowserOptions.
-//        SKPhotoBrowserOptions.textAndIconColor = UIColor(Color.black)
     }
 
     
