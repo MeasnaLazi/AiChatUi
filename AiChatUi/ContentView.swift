@@ -24,7 +24,8 @@ struct ContentView: View {
         chatViewModel.sendMessage(content: text, type: .text)
         Task {
 //            await chatViewModel.sendMessageToApi(content: text)
-            await chatViewModel.sendMessageToApiStreaming(content: text)
+//            await chatViewModel.sendMessageToApiStreaming(content: text)
+//            await chatViewModel.sendMessageToLiveStreaming(content: text)
         }
         
 //                let temText = inputText
@@ -59,27 +60,30 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
-                switch tapType {
-                case .send:
-                    onSend()
-                case .voice:
-                    print("TODO: Voice")
-                case .stop:
-                    print("TODO: Stop")
-                    chatViewModel.stopAnswering()
-                }
-            }
-            .aiChatTheme(aiChattheme)
-            .navigationTitle("Agent Chat")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-        .onAppear() {
-            Task {
-                await chatViewModel.onInitialize()
-            }
-        }
+        
+        AudioView(sessionId: "lazi_session")
+//        WebSocketDemoView()/
+//        NavigationView {
+//            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
+//                switch tapType {
+//                case .send:
+//                    onSend()
+//                case .voice:
+//                    print("TODO: Voice")
+//                case .stop:
+//                    print("TODO: Stop")
+//                    chatViewModel.stopAnswering()
+//                }
+//            }
+//            .aiChatTheme(aiChattheme)
+//            .navigationTitle("Agent Chat")
+//            .navigationBarTitleDisplayMode(.inline)
+//        }
+//        .onAppear() {
+//            Task {
+//                await chatViewModel.onInitialize()
+//            }
+//        }
     }
 }
 

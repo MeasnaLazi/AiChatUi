@@ -8,7 +8,7 @@ import SwiftUI
 
 class ChatViewModel: BaseChatViewModel {
     
-    private let adkRepository: AdkRepository = AdkRepositoryImp(requestExecute: APIClient())
+    private let adkRepository: SessionRepository = SessionRepositoryImp(requestExecute: APIClient())
     private let runRepository: RunRepository = RunRepositoryImp(requestExecute: APIClient())
     private var session: Session?
     var streamTask: Task<Void, Never>? = nil
@@ -23,7 +23,6 @@ class ChatViewModel: BaseChatViewModel {
             
             self.session = session
             self.extractDataAndSetToList(session: session)
-            
         } catch let error {
             print(error.localizedDescription)
         }

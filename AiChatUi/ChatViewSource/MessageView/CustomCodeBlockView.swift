@@ -39,9 +39,7 @@ struct CustomCodeBlockView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + WAIT_IN_SEC_AFTER_CLICK_COPIED) {
                         isCopied.toggle()
                     }
-                    
                 }
-  
             }
             .padding(.horizontal)
             .padding(.vertical, 8)

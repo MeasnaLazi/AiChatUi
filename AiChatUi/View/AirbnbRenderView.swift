@@ -1,5 +1,5 @@
 //
-//  TextOnlyMessgae.swift
+//  AirbnbRenderView.swift
 //  AiChatUi
 //
 //  Created by Measna on 11/5/25.

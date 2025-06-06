@@ -1,14 +1,14 @@
 //
-//  ADKApi.swift
+//  SessionApi.swift
 //  AiChatUi
 //
 //  Created by Measna on 25/5/25.
 //
 import Foundation
 
-enum AdkApi : Requestable {
+enum SessionApi : Requestable {
     var requestURL: URL {
-        return URL(string: "http://localhost:8000/apps/airbnb")!
+        return URL(string: "http://192.168.1.89:8000/apps/airbnb")!
     }
     
     var path: String? {

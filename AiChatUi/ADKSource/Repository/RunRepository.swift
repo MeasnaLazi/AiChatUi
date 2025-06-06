@@ -8,6 +8,7 @@
 import Foundation
 
 protocol RunRepository {
+    func runLive(sessionId: String, query: [String: String]) async throws -> WebSocket
     func runSSE(data: Data) async throws -> AsyncThrowingStream<Event, Error>
     func run(data: Data) async throws -> [Event]
 }
@@ -17,6 +18,10 @@ struct RunRepositoryImp : RunRepository, BaseRepository {
     
     init(requestExecute: RequestExecutor) {
         self.requestExecutor = requestExecute
+    }
+    
+    func runLive(sessionId: String, query: [String: String]) async throws -> WebSocket {
+        try await createWebSocket(RunApi.runLive(sessionId: sessionId, query: query))
     }
     
     func runSSE(data: Data) async throws -> AsyncThrowingStream<Event, Error> {

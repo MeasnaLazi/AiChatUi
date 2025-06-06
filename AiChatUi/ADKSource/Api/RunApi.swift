@@ -8,7 +8,12 @@ import Foundation
 
 enum RunApi : Requestable {
     var requestURL: URL {
-        return URL(string: "http://localhost:8000")!
+        switch self {
+        case .runLive:
+            return URL(string: "ws://192.168.1.89:8000")!
+        default:
+            return URL(string: "http://192.168.1.89:8000")!
+        }
     }
     
     var path: String? {
@@ -17,6 +22,8 @@ enum RunApi : Requestable {
            return "/run_sse"
         case .run:
            return "/run"
+        case .runLive(let sessionId, _):
+           return "/ws/\(sessionId)"
         }
     }
     
@@ -34,6 +41,9 @@ enum RunApi : Requestable {
             return .body(data)
         case .run(let data):
             return .body(data)
+        case .runLive(_, let query):
+            return .query(query)
+        
         }
     }
     
@@ -43,4 +53,5 @@ enum RunApi : Requestable {
     
     case runSSE(data: Data)
     case run(data: Data)
+    case runLive(sessionId: String, query: [String: String])
 }

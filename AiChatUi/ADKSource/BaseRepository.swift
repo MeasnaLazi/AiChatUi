@@ -17,6 +17,9 @@ extension BaseRepository {
         try await self.requestExecutor.execute(request)
     }
     func executeStream<T: Responable>(_ request: Requestable) async throws -> AsyncThrowingStream<T, Error> {
-          try await self.requestExecutor.executeStream(request)
+        try await self.requestExecutor.executeStream(request)
+    }
+    func createWebSocket(_ request: Requestable) async throws -> WebSocket {
+        try await self.requestExecutor.createWebSocket(request)
     }
 }

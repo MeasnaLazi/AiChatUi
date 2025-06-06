@@ -9,6 +9,32 @@ import Foundation
 
 struct APIClient: RequestExecutor {
     
+    enum WebSocketStreamError: Error, LocalizedError {
+        case connectionSetupFailed(Error?) // More specific than just invalidResponse
+        case receiveError(Error)
+        case decodingError(Error, Data?) // Including raw data can be helpful for debugging
+        case unexpectedMessageType // If a message type (e.g. string/data) cannot be handled for T
+        case userCancelledStream
+        case serverClosedConnection(URLSessionWebSocketTask.CloseCode, Data?) // For graceful server-side close
+
+        var errorDescription: String? {
+            switch self {
+            case .connectionSetupFailed(let err):
+                return "WebSocket connection setup failed: \(err?.localizedDescription ?? "Unknown reason")"
+            case .receiveError(let err):
+                return "Error receiving WebSocket message: \(err.localizedDescription)"
+            case .decodingError(let err, _):
+                return "Failed to decode WebSocket message: \(err.localizedDescription)"
+            case .unexpectedMessageType:
+                return "Received an unexpected WebSocket message type that cannot be decoded into the target type."
+            case .userCancelledStream:
+                return "WebSocket stream was cancelled by the user."
+            case .serverClosedConnection(let closeCode, _):
+                return "WebSocket connection closed by server with code: \(closeCode)."
+            }
+        }
+    }
+    
     enum APIError: Error {
         case requestFailed(String)
         case invalidResponse
@@ -33,22 +59,18 @@ struct APIClient: RequestExecutor {
 
         do {
             let (data, response) = try await session.data(for: urlRequest)
-
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw APIError.invalidResponse
             }
-
             if !(200..<300).contains(httpResponse.statusCode) {
                 throw APIError.requestFailed("Invalid response status: \(httpResponse.statusCode)")
             }
-            
             // when session delete success, it's response "null"
             if let text = String(data: data, encoding: .utf8), text == "null" {
                 let textData = Data("true".utf8)
                 return try T.decode(textData)
             }
 //            print("data: \(String(describing: String(data: data, encoding: .utf8)))")
-
             return try T.decode(data)
             
         } catch let decodingError as DecodingError {
@@ -65,10 +87,8 @@ struct APIClient: RequestExecutor {
         
         return AsyncThrowingStream { continuation in
             let networkTask = Task {
-                
                 do {
                     let (bytes, response) = try await URLSession.shared.bytes(for: urlRequest)
-                    
                     guard let httpResponse = response as? HTTPURLResponse else {
                         throw APIError.invalidResponse
                     }
@@ -87,11 +107,9 @@ struct APIClient: RequestExecutor {
                             }
                             errorBody?.append(byte)
                         }
-                        
                         if let data = errorBody {
                             errorDataString = String(data: data, encoding: .utf8) ?? "Could not decode error body."
                         }
-                        
                         continuation.finish(throwing: APIError.requestFailed("Invalid response status: \( (response as? HTTPURLResponse)?.statusCode ?? 0 ). Body: \(errorDataString)"))
                         
                         return
@@ -105,17 +123,14 @@ struct APIClient: RequestExecutor {
                         
                         if line.hasPrefix("data: ") {
                             let dataString = String(line.dropFirst(6)) // Remove "data: "
-                            
                             if dataString == "[DONE]" {
                                 continuation.finish()
                                 return
                             }
-                            
                             guard let jsonData = dataString.data(using: .utf8) else {
                                 print("Warning: Could not convert string to data: \(dataString)")
                                 continue
                             }
-      
                             do {
                                 let streamResponse = try T.decode(jsonData)
                                 continuation.yield(streamResponse)
@@ -152,6 +167,13 @@ struct APIClient: RequestExecutor {
                 }
             }
         }
+    }
+    
+    func createWebSocket(_ request: Requestable) async throws -> WebSocket {
+        let urlRequest = self.createURLRequest(from: request)
+        let url = urlRequest.url!
+        
+        return WebSocket(url: url)
     }
     
     private func createURLRequest(from requestable: Requestable) -> URLRequest {
