@@ -8,7 +8,7 @@
 struct Receive: Decodable {
     let mimeType: String?
     let data: String?
-    let turnComplete: String?
+    let turnComplete: Bool?
     let isInterruped:Bool?
     
     enum CodingKeys: String, CodingKey {
@@ -22,7 +22,7 @@ struct Receive: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         mimeType = try container.decodeIfPresent(String.self, forKey: .mimeType)
         data = try container.decodeIfPresent(String.self, forKey: .data)
-        turnComplete = try container.decodeIfPresent(String.self, forKey: .turnComplete)
+        turnComplete = try container.decodeIfPresent(Bool.self, forKey: .turnComplete)
         isInterruped = try container.decodeIfPresent(Bool.self, forKey: .interruped)
     }
     

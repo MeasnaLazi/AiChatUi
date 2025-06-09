@@ -9,35 +9,68 @@ import SwiftUI
 
 struct AudioView: View {
     
+    @Environment(\.aiChatTheme) private var theme
+    
     @StateObject private var viewModel = AudioViewModel()
     let sessionId: String
 
     var body: some View {
-        VStack(spacing: 20) {
-            AudioVisualizerView(audioLevel: $viewModel.audioLevel)
+        ZStack(alignment: .center)  {
+            VStack {
+                Spacer()
+                AudioVisualizerView(audioLevel: $viewModel.audioLevel)
+                Spacer()
+            }
             
-            Text(viewModel.isStreaming ? "Streaming..." : "Stopped")
-                .font(.headline)
-
-            Button(action: {
-                if viewModel.isStreaming {
-                    viewModel.stopStreaming()
-                } else {
-                    Task { await viewModel.startConversation() }
+            VStack {
+                HStack {
+                    Spacer()
+                    Text(viewModel.webSocketStatus)
+                        .foregroundColor(statusFG())
+                    Spacer()
                 }
-            }) {
-                Text(viewModel.isStreaming ? "Stop" : "Start")
-                    .padding()
-                    .background(viewModel.isStreaming ? Color.red : Color.green)
-                    .foregroundColor(.white)
-                    .clipShape(Capsule())
+                
+                Spacer()
+
+                Button(action: {
+                    if viewModel.isStreaming {
+                        viewModel.stopConversation()
+                    } else {
+                        Task { await viewModel.startConversation() }
+                    }
+                }) {
+                        
+                Image(systemName: viewModel.isStreaming ? "stop.fill" : "play.fill")
+                        .font(.system(size: 16))
+                        .padding(8)
+                        .background(theme.colors.inputSendButtonIconBG)
+                        .foregroundColor(theme.colors.inputSendButtonIconFG)
+                        .clipShape(Circle())
+                }
+                .padding(.bottom, 32)
             }
         }
-        .padding()
-        .onAppear() {
+        .padding(.top)
+        .onAppear {
             Task {
-                await viewModel.initilize(sessionId: sessionId)
+                await viewModel.startConnection(sessionId: sessionId)
             }
+        }
+        .onDisappear {
+            viewModel.endConnection()
+        }
+    }
+    
+    private func statusFG() -> Color {
+        switch viewModel.webSocketStatus {
+        case "Connected":
+            return .green
+        case "Disconnected":
+            return .orange
+        case "Error":
+            return .red
+        default:
+            return .blue
         }
     }
 }

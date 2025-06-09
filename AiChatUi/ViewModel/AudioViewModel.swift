@@ -16,10 +16,10 @@ class AudioViewModel: ObservableObject {
     private var eventStreamTask: Task<Void, Never>?
     
     @Published var isStreaming = false
-    @Published var webSocketStatus = "Disconnected"
+    @Published var webSocketStatus = "Connecting"
     @Published var audioLevel: CGFloat = 0.0
     
-    func initilize(sessionId: String) async {
+    func startConnection(sessionId: String) async {
         guard let webSocket = try? await runRepository.runLive(sessionId: sessionId, query: ["is_audio" : "true"]) else {
             print("Can not create webSocket!")
             return
@@ -48,36 +48,38 @@ class AudioViewModel: ObservableObject {
                     case .disconnected:
                         print("disconnected")
                         self.webSocketStatus = "Disconnected"
-                        self.cleanupConnection()
+                        self.endConnection()
                     case .data(let data):
-                        
+                       
                         guard let receive = try? decoder.decode(Receive.self, from: data) else {
                             print("Can not decode binary data: \(data.count) bytes")
                             return
                         }
                         
-                        guard let data = receive.data else {
-                            print("Interruped, data is emptry!")
+                        if let turnComplete = receive.turnComplete, turnComplete {
+                            print("Turn completed")
                             return
                         }
                         
+                        if let interruped = receive.isInterruped, interruped {
+                            print("Interruped")
+//                            self.audioPlayer.stopPlaying()
+                            return
+                        }
+                        
+                        
+                        guard let data = receive.data else {
+                            print("data is emptry!")
+                            return
+                        }
+
+                        print("...receiving data")
                         let audioData = Data(base64Encoded: data)
                         self.audioPlayer.playing(data: audioData!) { buffered in
                             DispatchQueue.main.async {
                                 self.audioLevel = self.calculateAudioLevel(from: buffered)
                             }
                         }
-                        
-//                        if let string = String(data: data, encoding: .ascii) {
-//                            print("Received data: \(string)")
-//                            let json = try? JSONSerialization.jsonObject(with: data) as? [String: String]
-//                            let base64 = json!["data"]!
-//                            let audioData = Data(base64Encoded: base64)
-//                            self.audioPlayer.playing(data: audioData!)
-//                                
-//                        } else {
-//                            print("Received binary data: \(data.count) bytes")
-//                        }
                     case .error(let errorMessage):
                         print("error: \(errorMessage)")
                         self.webSocketStatus = "Error"
@@ -89,7 +91,7 @@ class AudioViewModel: ObservableObject {
                 if self.webSocketStatus != "Connected" && self.webSocketStatus != "Error" {
                     self.webSocketStatus = "Disconnected"
                 }
-                self.cleanupConnection()
+                self.endConnection()
             }
         }
     }
@@ -101,8 +103,9 @@ class AudioViewModel: ObservableObject {
             print("webSocket is not initialize!")
             return
         }
-       
+        
         do {
+            try await audioPlayer.start()
             try audioPlayer.recording { data in
                 print("sending data...")
                 let dataString = self.createSendString(data: data)
@@ -110,20 +113,28 @@ class AudioViewModel: ObservableObject {
                     try? await webSocket.send(string: dataString)
                 }
             }
-       
-            try await audioPlayer.start()
             isStreaming = true
         } catch {
             print("error: \(error.localizedDescription)")
         }
     }
     
-    func stopStreaming() {
-        isStreaming = false
-        audioPlayer.stop()
-        cleanupConnection()
+    func stopConversation() {
+        if isStreaming {
+            isStreaming = false
+            audioPlayer.stop()
+        }
     }
-        
+    
+    deinit {
+        Task { [weak self] in
+            if let self {
+                await self.stopConversation()
+                await self.endConnection()
+            }
+        }
+    }
+    
     private func createSendString(data: Data) -> String {
         let base64 = data.base64EncodedString()
         let payload: [String: String] = ["mime_type": "audio/pcm", "data": base64]
@@ -143,18 +154,17 @@ class AudioViewModel: ObservableObject {
         return jsonString
     }
         
-    private func cleanupConnection() {
-        
+    func endConnection() {
         guard let webSocket = self.webSocket else {
             print("webSocket is not initialize!")
             return
         }
-        eventStreamTask?.cancel()
-        eventStreamTask = nil
+        self.eventStreamTask?.cancel()
+        self.eventStreamTask = nil
+        
         Task {
             await webSocket.disconnect()
         }
-
         self.webSocket = nil
         print("Connection cleaned up.")
     }

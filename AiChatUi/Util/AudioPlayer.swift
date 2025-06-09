@@ -16,7 +16,7 @@ class AudioPlayer {
     
     func start() async throws {
         
-        try configureAudioSession()
+//        try configureAudioSession()
         
         let hasPermission = await requestMicrophonePermission()
         if !hasPermission {
@@ -37,6 +37,12 @@ class AudioPlayer {
 
         try audioEngine.start()
         playerNode.play()
+    }
+    
+    func stopPlaying() {
+        if playerNode.isPlaying {
+            playerNode.stop()
+        }
     }
 
     func stop() {
@@ -136,7 +142,7 @@ class AudioPlayer {
     
     private func configureAudioSession() throws {
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playAndRecord, mode: .default, options: .defaultToSpeaker)
+        try session.setCategory(.playAndRecord, mode: .voiceChat, options: .defaultToSpeaker)
         try session.setActive(true)
         print("AVAudioSession configured and activated.")
     }
@@ -176,6 +182,7 @@ class AudioPlayer {
     }
     
     private func dataToPCMBuffer(data: Data, format: AVAudioFormat) -> AVAudioPCMBuffer? {
+        
         let frameLength = UInt32(data.count / 2)
         
         guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameLength) else {

@@ -14,7 +14,7 @@ struct AudioVisualizerView: View {
             TimelineView(.animation(minimumInterval: 0.05)) { timeline in
                 circularVisualizerBars(for: timeline.date)
             }
-            .frame(width: 300, height: 300) // Give the circle a defined frame
+            .frame(width: 300, height: 300)
         }
     }
 
@@ -24,7 +24,7 @@ struct AudioVisualizerView: View {
 
         return ZStack {
             Circle()
-                .stroke(Color.cyan.opacity(0.2), lineWidth: 2)
+                .stroke(Color.gray.opacity(0.2), lineWidth: 2)
 
             ForEach(0..<numberOfBars, id: \.self) { index in
                 let barLength = calculateBarLength(
@@ -43,7 +43,7 @@ struct AudioVisualizerView: View {
                     .frame(width: 4, height: barLength)
                     .rotationEffect(.radians(angle + .pi / 2))
                     .offset(x: xPos, y: yPos)
-                    .foregroundStyle(.cyan.gradient)
+                    .foregroundStyle(.gray.gradient)
                     .animation(.interactiveSpring(response: 0.05, dampingFraction: 0.6), value: barLength)
             }
         }
