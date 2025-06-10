@@ -10,33 +10,47 @@ class AudioPlayer {
 
     private let audioEngine = AVAudioEngine()
     private let playerNode = AVAudioPlayerNode()
-
-    private var inputFormat: AVAudioFormat!
+    
     private var outputFormat: AVAudioFormat!
     
-    func start() async throws {
-        
-//        try configureAudioSession()
-        
-        let hasPermission = await requestMicrophonePermission()
-        if !hasPermission {
-            print("Permission denied. We should disable recording features.")
-            throw AudioPlayerError.noPermission
-        }
+    private var isTapInstalled = false
     
-        inputFormat = audioEngine.inputNode.outputFormat(forBus: 0)
+    func activate() async throws {
+        
+        try configureAudioSession()
+                
         outputFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32,
                                      sampleRate: 24000,
                                      channels: 2,
                                      interleaved: false)
 
         audioEngine.attach(playerNode)
+
         audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: outputFormat)
+
+        audioEngine.inputNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { _, _ in }
+        audioEngine.inputNode.removeTap(onBus: 0)
         
         audioEngine.prepare()
-
         try audioEngine.start()
-        playerNode.play()
+        
+        print("AudioPlayer activated. Engine is running.")
+    }
+    
+    func deactivate() {
+        print("AudioPlayer deactivating...")
+        
+        audioEngine.stop()
+
+        if isTapInstalled {
+            audioEngine.inputNode.removeTap(onBus: 0)
+            isTapInstalled = false
+        }
+        
+        audioEngine.disconnectNodeOutput(playerNode)
+        audioEngine.detach(playerNode)
+        
+        try? removeConfigureAudioSession()
     }
     
     func stopPlaying() {
@@ -48,10 +62,22 @@ class AudioPlayer {
     func stop() {
         audioEngine.stop()
         playerNode.stop()
-        audioEngine.inputNode.removeTap(onBus: 0)
+        
+        if isTapInstalled {
+            audioEngine.inputNode.removeTap(onBus: 0)
+            isTapInstalled = false
+        }
+        
+        try? removeConfigureAudioSession()
     }
 
-    func recording(steaming: @escaping(Data)->()) throws {
+    func startRecording(steaming: @escaping(Data)->()) throws {
+        
+        guard !isTapInstalled else {
+            print("Tap is already installed.")
+            return
+        }
+        
         let inputNode = audioEngine.inputNode
         let sourceFormat = inputNode.outputFormat(forBus: 0)
         
@@ -115,10 +141,26 @@ class AudioPlayer {
             }
             
             steaming(data)
+        
+        }
+        
+        isTapInstalled = true
+    }
+    
+    func stopRecording() {
+        if isTapInstalled {
+            audioEngine.inputNode.removeTap(onBus: 0)
+            isTapInstalled = false
+            print("Recording tap removed.")
         }
     }
     
     func playing(data: Data, buffered: (AVAudioPCMBuffer)->()) {
+        guard audioEngine.isRunning else {
+            print("AudioPlayer playing failed: Engine is not running.")
+            return
+        }
+        
         if data.isEmpty {
             print("data is empty, skipping buffer creation.")
             return
@@ -145,6 +187,11 @@ class AudioPlayer {
         try session.setCategory(.playAndRecord, mode: .voiceChat, options: .defaultToSpeaker)
         try session.setActive(true)
         print("AVAudioSession configured and activated.")
+    }
+    
+    private func removeConfigureAudioSession() throws {
+        let session = AVAudioSession.sharedInstance()
+        try session.setActive(false)
     }
     
     private func requestMicrophonePermission() async -> Bool {
