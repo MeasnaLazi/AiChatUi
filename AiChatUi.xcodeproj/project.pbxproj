@@ -10,6 +10,7 @@
 		550CD5712DE538AC00A3A8E2 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 550CD5702DE538AC00A3A8E2 /* SDWebImageSwiftUI */; };
 		5540B3992DD4051C00E6F00A /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5540B3982DD4051C00E6F00A /* MarkdownUI */; };
 		5540B39F2DD407FA00E6F00A /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 5540B39E2DD407FA00E6F00A /* Markdown */; };
+		5556D94B2DF8EFDB006E0F0D /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 5556D94A2DF8EFDB006E0F0D /* WebRTC */; };
 		55B341262DD5577F00950641 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 55B341252DD5577F00950641 /* Splash */; };
 		55B341282DD5577F00950641 /* SplashHTMLGen in Frameworks */ = {isa = PBXBuildFile; productRef = 55B341272DD5577F00950641 /* SplashHTMLGen */; };
 		55B3412A2DD5577F00950641 /* SplashImageGen in Frameworks */ = {isa = PBXBuildFile; productRef = 55B341292DD5577F00950641 /* SplashImageGen */; };
@@ -82,6 +83,7 @@
 				5540B39F2DD407FA00E6F00A /* Markdown in Frameworks */,
 				55B341262DD5577F00950641 /* Splash in Frameworks */,
 				550CD5712DE538AC00A3A8E2 /* SDWebImageSwiftUI in Frameworks */,
+				5556D94B2DF8EFDB006E0F0D /* WebRTC in Frameworks */,
 				55B341282DD5577F00950641 /* SplashHTMLGen in Frameworks */,
 				55B3412C2DD5577F00950641 /* SplashMarkdown in Frameworks */,
 				55CDF9A62DEBC0C100838FF9 /* SKPhotoBrowser in Frameworks */,
@@ -155,6 +157,7 @@
 				55B3412D2DD5577F00950641 /* SplashTokenizer */,
 				550CD5702DE538AC00A3A8E2 /* SDWebImageSwiftUI */,
 				55CDF9A52DEBC0C100838FF9 /* SKPhotoBrowser */,
+				5556D94A2DF8EFDB006E0F0D /* WebRTC */,
 			);
 			productName = AiChatUi;
 			productReference = 5511AA152DBF07DA00289625 /* AiChatUi.app */;
@@ -244,6 +247,7 @@
 				55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */,
 				550CD56F2DE538AC00A3A8E2 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				55CDF9A42DEBC0C100838FF9 /* XCRemoteSwiftPackageReference "SKPhotoBrowser" */,
+				5556D9492DF8EFDB006E0F0D /* XCRemoteSwiftPackageReference "WebRTC" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5511AA162DBF07DA00289625 /* Products */;
@@ -630,6 +634,14 @@
 				minimumVersion = 0.6.0;
 			};
 		};
+		5556D9492DF8EFDB006E0F0D /* XCRemoteSwiftPackageReference "WebRTC" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stasel/WebRTC.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 137.0.0;
+			};
+		};
 		55B341242DD5577F00950641 /* XCRemoteSwiftPackageReference "Splash" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/JohnSundell/Splash";
@@ -663,6 +675,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5540B39D2DD407FA00E6F00A /* XCRemoteSwiftPackageReference "swift-markdown" */;
 			productName = Markdown;
+		};
+		5556D94A2DF8EFDB006E0F0D /* WebRTC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5556D9492DF8EFDB006E0F0D /* XCRemoteSwiftPackageReference "WebRTC" */;
+			productName = WebRTC;
 		};
 		55B341252DD5577F00950641 /* Splash */ = {
 			isa = XCSwiftPackageProductDependency;
