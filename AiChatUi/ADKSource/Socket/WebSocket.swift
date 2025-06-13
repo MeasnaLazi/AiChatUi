@@ -116,7 +116,7 @@ actor WebSocket {
                         self.eventContinuation.yield(.error(WebSocketError.unknownMessageType.localizedDescription))
                     }
                 } catch {
-                    print("receiveMessages error: \(error.localizedDescription)")
+                    print("WebSocket: ReceiveMessages error: \(error.localizedDescription)")
                     isConnectionActive = false
                     
                     let nsError = error as NSError
@@ -133,7 +133,7 @@ actor WebSocket {
                 }
             }
             if isConnectionActive && Task.isCancelled {
-                print("receiveMessages task cancelled!")
+                print("WebSocket: ReceiveMessages task cancelled!")
                 self.eventContinuation.yield(.disconnected)
                 self.eventContinuation.finish()
                 currentTask.cancel(with: .normalClosure, reason: nil)

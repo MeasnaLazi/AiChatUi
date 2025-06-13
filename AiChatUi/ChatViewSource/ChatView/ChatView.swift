@@ -158,7 +158,7 @@ public struct ChatView: View {
     }
     
     private func onButtonClick(tapType: ButtonTapType) {
-        if !inputText.isEmpty, let onButtonTapped {
+        if let onButtonTapped {
             onButtonTapped(tapType)
         }
     }

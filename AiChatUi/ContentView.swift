@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
     @StateObject private var chatViewModel = ChatViewModel()
     @State private var inputText: String = ""
+    @State private var isShowVoice = false
 
     var aiChattheme: AiChatTheme {
         colorScheme == .dark ? .dark : .light
@@ -24,8 +25,7 @@ struct ContentView: View {
         chatViewModel.sendMessage(content: text, type: .text)
         Task {
 //            await chatViewModel.sendMessageToApi(content: text)
-//            await chatViewModel.sendMessageToApiStreaming(content: text)
-//            await chatViewModel.sendMessageToLiveStreaming(content: text)
+            await chatViewModel.sendMessageToApiStreaming(content: text)
         }
         
 //                let temText = inputText
@@ -60,30 +60,31 @@ struct ContentView: View {
     }
     
     var body: some View {
-        
-        AudioView(sessionId: "lazi_session")
-//        WebSocketDemoView()/
-//        NavigationView {
-//            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
-//                switch tapType {
-//                case .send:
-//                    onSend()
-//                case .voice:
-//                    print("TODO: Voice")
-//                case .stop:
-//                    print("TODO: Stop")
-//                    chatViewModel.stopAnswering()
-//                }
-//            }
-//            .aiChatTheme(aiChattheme)
-//            .navigationTitle("Agent Chat")
-//            .navigationBarTitleDisplayMode(.inline)
-//        }
-//        .onAppear() {
-//            Task {
-//                await chatViewModel.onInitialize()
-//            }
-//        }
+        NavigationView {
+            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
+                switch tapType {
+                case .send:
+                    onSend()
+                case .voice:
+                    print("TODO: Voice")
+                    self.isShowVoice.toggle()
+                case .stop:
+                    print("TODO: Stop")
+                    chatViewModel.stopAnswering()
+                }
+            }
+            .sheet(isPresented: $isShowVoice) {
+                AudioView(sessionId: "lazi_session")
+            }
+            .aiChatTheme(aiChattheme)
+            .navigationTitle("Agent Chat")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .onAppear() {
+            Task {
+                await chatViewModel.onInitialize()
+            }
+        }
     }
 }
 

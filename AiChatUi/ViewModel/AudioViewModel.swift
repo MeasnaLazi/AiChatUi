@@ -93,11 +93,15 @@ class AudioViewModel: ObservableObject {
         }
     }
     
+    func cleanUp() {
+        self.stopConversation()
+        self.endConnection()
+    }
+    
     deinit {
         Task { [weak self] in
             if let self {
-                await self.stopConversation()
-                await self.endConnection()
+                await self.cleanUp()
             }
         }
     }
