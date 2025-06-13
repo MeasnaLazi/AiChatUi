@@ -9,8 +9,6 @@ import SwiftUI
 
 struct AudioView: View {
     
-    @Environment(\.aiChatTheme) private var theme
-    
     @StateObject private var viewModel = AudioViewModel()
     let sessionId: String
 
@@ -22,6 +20,24 @@ struct AudioView: View {
                 Spacer()
             }
             
+            Button(action: {
+                if viewModel.isStreaming {
+                    viewModel.stopConversation()
+                } else {
+                    Task {
+                        await viewModel.startConversation()
+                    }
+                }
+            }) {
+                    
+            Image(systemName: viewModel.isStreaming ? "stop.fill" : "play.fill")
+                    .font(.system(size: 24))
+                    .padding(12)
+                    .background(Color(hex: 0x1e1e1e))
+                    .foregroundColor(Color.white)
+                    .clipShape(Circle())
+            }
+            
             VStack {
                 HStack {
                     Spacer()
@@ -31,26 +47,6 @@ struct AudioView: View {
                 }
                 
                 Spacer()
-
-                Button(action: {
-                    if viewModel.isStreaming {
-                        viewModel.stopConversation()
-                    } else {
-                        Task {
-                            await viewModel.startConversation()
-                        }
-                   
-                    }
-                }) {
-                        
-                Image(systemName: viewModel.isStreaming ? "stop.fill" : "play.fill")
-                        .font(.system(size: 16))
-                        .padding(8)
-                        .background(theme.colors.inputSendButtonIconBG)
-                        .foregroundColor(theme.colors.inputSendButtonIconFG)
-                        .clipShape(Circle())
-                }
-                .padding(.bottom, 32)
             }
         }
         .padding(.top)

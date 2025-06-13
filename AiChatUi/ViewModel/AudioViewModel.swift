@@ -15,7 +15,7 @@ class AudioViewModel: ObservableObject {
     private var eventStreamTask: Task<Void, Never>?
     
     @Published var isStreaming = false
-    @Published var webSocketStatus = "Connecting"
+    @Published var webSocketStatus = "Connecting..."
     @Published var audioLevel: CGFloat = 0.0
     
     private let audioPlayer: AudioPlayer = AudioPlayerImp()
