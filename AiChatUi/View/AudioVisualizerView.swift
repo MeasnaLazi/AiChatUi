@@ -50,22 +50,12 @@ struct AudioVisualizerView: View {
     }
 
     private func calculateBarLength(for index: Int, numberOfBars: Int, audioLevel: CGFloat, date: Date) -> CGFloat {
-        let speakingThreshold: CGFloat = 0.1
         let phase = date.timeIntervalSince1970
-
-        if audioLevel > speakingThreshold {
-            let sineWavePosition = sin( (Double(index) / Double(numberOfBars) * 2 * .pi) + phase)
-            let dampeningFactor = (sineWavePosition + 1) / 2 * 0.8 + 0.2
-            let baseLength: CGFloat = 20
-            let animatedLength: CGFloat = 100
-            return baseLength + audioLevel * dampeningFactor * animatedLength
-            
-        } else {
-            let slowPhase = phase / 2
-            let idleSineWavePosition = sin( (Double(index) / Double(numberOfBars) * .pi) + slowPhase)
-            let idleAmplitude: CGFloat = 5
-            let baseHeight: CGFloat = 20
-            return baseHeight + idleSineWavePosition * idleAmplitude
-        }
+        let animatedLength: CGFloat = 50
+        let idleSineWavePosition = sin( (Double(index) / Double(numberOfBars) * .pi) + phase)
+        let idleAmplitude: CGFloat = 5
+        let baseHeight: CGFloat = 20 + audioLevel * animatedLength
+    
+        return baseHeight + idleSineWavePosition * idleAmplitude
     }
 }
