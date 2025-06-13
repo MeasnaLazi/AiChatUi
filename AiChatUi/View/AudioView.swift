@@ -18,7 +18,7 @@ struct AudioView: View {
         ZStack(alignment: .center)  {
             VStack {
                 Spacer()
-//                AudioVisualizerView(audioLevel: $viewModel.audioLevel)
+                AudioVisualizerView(audioLevel: $viewModel.audioLevel)
                 Spacer()
             }
             
@@ -31,27 +31,26 @@ struct AudioView: View {
                 }
                 
                 Spacer()
-                
-                PushToTalkButton()
-                               .environmentObject(viewModel)
 
-//                Button(action: {
-//                    if viewModel.isStreaming {
-//                        viewModel.stopConversation()
-//                    } else {
-////                        Task { await  }
-//                        viewModel.startConversation()
-//                    }
-//                }) {
-//                        
-//                Image(systemName: viewModel.isStreaming ? "stop.fill" : "play.fill")
-//                        .font(.system(size: 16))
-//                        .padding(8)
-//                        .background(theme.colors.inputSendButtonIconBG)
-//                        .foregroundColor(theme.colors.inputSendButtonIconFG)
-//                        .clipShape(Circle())
-//                }
-//                .padding(.bottom, 32)
+                Button(action: {
+                    if viewModel.isStreaming {
+                        viewModel.stopConversation()
+                    } else {
+                        Task {
+                            await viewModel.startConversation()
+                        }
+                   
+                    }
+                }) {
+                        
+                Image(systemName: viewModel.isStreaming ? "stop.fill" : "play.fill")
+                        .font(.system(size: 16))
+                        .padding(8)
+                        .background(theme.colors.inputSendButtonIconBG)
+                        .foregroundColor(theme.colors.inputSendButtonIconFG)
+                        .clipShape(Circle())
+                }
+                .padding(.bottom, 32)
             }
         }
         .padding(.top)
