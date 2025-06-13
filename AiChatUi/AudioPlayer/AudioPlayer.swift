@@ -15,9 +15,11 @@ protocol AudioPlayer {
 
 class AudioPlayerImp: AudioPlayer, RecorderDelegate {
     
-    private var player = Player()
-    private var recorder = Recorder()
-    private var recordingCallBack: ((Data)->())?
+    typealias RecorderCallBack = (Data)->()
+    
+    private let player = Player()
+    private let recorder = Recorder()
+    private var recorderCallBack: RecorderCallBack?
     
     init() {
         setUpSession()
@@ -25,9 +27,9 @@ class AudioPlayerImp: AudioPlayer, RecorderDelegate {
     }
     
     deinit {
-        removeSession()
         player.cleanUp()
         recorder.cleanUp()
+        removeSession()
     }
     
     func startPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?) {
@@ -42,8 +44,8 @@ class AudioPlayerImp: AudioPlayer, RecorderDelegate {
         player.stop()
     }
     
-    func startRecording(recording: @escaping (Data) -> ()) {
-        recordingCallBack = recording
+    func startRecording(recording: @escaping RecorderCallBack) {
+        recorderCallBack = recording
         recorder.start()
     }
     
@@ -52,8 +54,8 @@ class AudioPlayerImp: AudioPlayer, RecorderDelegate {
     }
     
     func recording(data: Data) {
-        if let recordingCallBack {
-            recordingCallBack(data)
+        if let recorderCallBack {
+            recorderCallBack(data)
         }
     }
     
@@ -70,7 +72,8 @@ class AudioPlayerImp: AudioPlayer, RecorderDelegate {
     
     private func removeSession() {
         do {
-            try AVAudioSession.sharedInstance().setActive(false)
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setActive(false)
         } catch {
             print("AudioPlayerImg: Failed to deactivate audio session - \(error)")
         }

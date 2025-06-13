@@ -8,17 +8,26 @@
 import AVFoundation
 
 class Player {
+    
+    typealias BufferCallBack = ((AVAudioPCMBuffer)->())
+    
     private let playbackEngine = AVAudioEngine()
     private let playerNode = AVAudioPlayerNode()
     private let playbackFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32,
                                                sampleRate: 24_000.0,
                                                channels: 2,
                                                interleaved: false)!
+    
+    private var bufferCallBack:BufferCallBack?
+    
     init() {
         setupEngine()
     }
     
-    func play(data: Data, buffered: (AVAudioPCMBuffer)->()) {
+    func play(data: Data, buffered: @escaping BufferCallBack) {
+        
+        bufferCallBack = buffered
+        
         if data.isEmpty {
             print("Player: Data is empty, skipping buffer creation.")
             return
@@ -30,7 +39,6 @@ class Player {
         }
                 
         if buffer.frameLength > 0 {
-            buffered(buffer)
             self.playerNode.scheduleBuffer(buffer)
             
             if !self.playerNode.isPlaying {
@@ -56,11 +64,19 @@ class Player {
         playbackEngine.connect(playerNode, to: playbackEngine.mainMixerNode, format: playbackFormat)
         
         do {
+            _ = playbackEngine.mainMixerNode
+            
             try playbackEngine.start()
             playerNode.play()
             print("Player: Engine started.")
         } catch {
             print("Player: Could not start engine - \(error)")
+        }
+        
+        playbackEngine.mainMixerNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, time) in
+            if let bufferCallBack = self.bufferCallBack {
+                bufferCallBack(buffer)
+            }
         }
     }
     

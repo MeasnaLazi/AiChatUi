@@ -59,9 +59,6 @@ struct AudioView: View {
                 await viewModel.startConnection(sessionId: sessionId)
             }
         }
-        .onDisappear {
-//            viewModel.endConnection()
-        }
     }
     
     private func statusFG() -> Color {
