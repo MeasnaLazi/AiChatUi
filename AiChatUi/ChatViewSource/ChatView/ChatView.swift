@@ -32,9 +32,9 @@ public struct ChatView: View {
     public var body: some View {
         VStack {
             listView
+                .animation(.easeInOut, value: viewModel.groupMessages)
             inputView
         }
-        .animation(.easeInOut, value: viewModel.groupMessages)
     }
     
     @ViewBuilder
