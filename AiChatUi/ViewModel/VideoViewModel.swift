@@ -1,15 +1,15 @@
 //
-//  AudioStreamingViewModel.swift
+//  VideoViewModel.swift
 //  AiChatUi
 //
-//  Created by Measna on 4/6/25.
+//  Created by Measna on 15/6/25.
 
 import SwiftUI
 import Accelerate
 import AVFoundation
 
 @MainActor
-class AudioViewModel: ObservableObject {
+class VideoViewModel: ObservableObject {
     private var webSocket: WebSocket?
     private let runRepository: RunRepository = RunRepositoryImp(requestExecute: APIClient())
     private var eventStreamTask: Task<Void, Never>?
@@ -18,31 +18,21 @@ class AudioViewModel: ObservableObject {
     @Published var webSocketStatus = "Connecting..."
     @Published var audioLevel: CGFloat = 0.0
     
-    private let audioPlayer: AudioPlayer = AudioPlayerImp()
+    let cameraLivePlayer: CameraLivePlayer = CameraLivePlayerImp()
     
     func startConnection(sessionId: String) async {
         guard let webSocket = try? await runRepository.runCustomLive(sessionId: sessionId, query: ["is_audio" : "true"]) else {
-            print("AudioViewModel: Can not create webSocket!")
+            print("VideoViewModel: Can not create webSocket!")
             return
         }
         self.webSocket = webSocket
         await webSocket.connect()
         startListeningToWebSocket()
     }
-    
-//    func startConnection(session: Session) async {
-//        guard let webSocket = try? await runRepository.runLive(session: session) else {
-//            print("AudioViewModel: Can not create webSocket!")
-//            return
-//        }
-//        self.webSocket = webSocket
-//        await webSocket.connect()
-//        startListeningToWebSocket()
-//    }
 
     private func startListeningToWebSocket() {
         guard let webSocket = self.webSocket else {
-            print("AudioViewModel: WebSocket is not initialize!")
+            print("VideoViewModel: WebSocket is not initialize!")
             return
         }
         
@@ -51,17 +41,17 @@ class AudioViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     switch event {
                     case .connected:
-                        print("AudioViewModel: Connected")
+                        print("VideoViewModel: Connected")
                         self.webSocketStatus = "Connected"
                     case .disconnected:
-                        print("AudioViewModel: Disconnected")
+                        print("VideoViewModel: Disconnected")
                         self.webSocketStatus = "Disconnected"
                         self.endConnection()
                     case .data(let data):
-                        print("AudioViewModel: ...receiving data")
+                        print("VideoViewModel: ...receiving data")
                         self.handleReceiveSound(data: data)
                     case .error(let errorMessage):
-                        print("AudioViewModel: error: \(errorMessage)")
+                        print("VideoViewModel: error: \(errorMessage)")
                         self.webSocketStatus = "Error"
                     }
                 }
@@ -79,14 +69,20 @@ class AudioViewModel: ObservableObject {
     
     func startConversation() async {
         guard let webSocket = self.webSocket else {
-            print("AudioViewModel: WebSocket is not initialize!")
+            print("VideoViewModel: WebSocket is not initialize!")
             return
         }
         isStreaming = true
         
-        audioPlayer.startRecording { data in
-            print("AudioViewModel: Sending data...")
-            let dataString = self.createSendString(data: data)
+        cameraLivePlayer.startRecording { data in
+//            print("VideoViewModel: Voice Sending data...")
+            let dataString = self.createSendString(data: data, type: "audio/pcm")
+            Task {
+                try? await webSocket.send(string: dataString)
+            }
+        } vedioRecording: {data in
+            print("VideoViewModel: Frame Sending data...")
+            let dataString = self.createSendString(data: data, type: "image/jpeg")
             Task {
                 try? await webSocket.send(string: dataString)
             }
@@ -96,8 +92,8 @@ class AudioViewModel: ObservableObject {
     func stopConversation() {
         if isStreaming {
             isStreaming = false
-            audioPlayer.stopPlaying()
-            audioPlayer.stopRecording()
+            cameraLivePlayer.stopPlaying()
+            cameraLivePlayer.stopRecording()
         }
     }
     
@@ -116,7 +112,7 @@ class AudioViewModel: ObservableObject {
     
     func endConnection() {
         guard let webSocket = self.webSocket else {
-            print("AudioViewModel: WebSocket is not initialize!")
+            print("VideoViewModel: WebSocket is not initialize!")
             return
         }
         self.eventStreamTask?.cancel()
@@ -126,22 +122,22 @@ class AudioViewModel: ObservableObject {
             await webSocket.disconnect()
         }
         self.webSocket = nil
-        print("AudioViewModel: Connection cleaned up.")
+        print("VideoViewModel: Connection cleaned up.")
     }
     
-    private func createSendString(data: Data) -> String {
+    private func createSendString(data: Data, type: String) -> String {
         let base64 = data.base64EncodedString()
-        let payload: [String: String] = ["mime_type": "audio/pcm", "data": base64]
+        let payload: [String: String] = ["mime_type": type, "data": base64]
         let encoder = JSONEncoder()
 
         encoder.outputFormatting = .prettyPrinted
         guard let jsonData = try? encoder.encode(payload) else {
-            print("AudioViewModel: Can not encode payload")
+            print("VideoViewModel: Can not encode payload")
             return ""
         }
         
         guard let jsonString = String(data: jsonData, encoding: .utf8) else {
-            print("AudioViewModel: Can not convert to string")
+            print("VideoViewModel: Can not convert to string")
             return ""
         }
         
@@ -167,28 +163,28 @@ class AudioViewModel: ObservableObject {
         decoder.dateDecodingStrategy = .iso8601
         
         guard let receive = try? decoder.decode(Receive.self, from: data) else {
-            print("AudioViewModel: Can not decode binary data: \(data.count) bytes")
+            print("VideoViewModel: Can not decode binary data: \(data.count) bytes")
             return
         }
         
         if let turnComplete = receive.turnComplete, turnComplete {
-            print("AudioViewModel: Turn completed")
+            print("VideoViewModel: Turn completed")
             return
         }
         
         if let interruped = receive.isInterruped, interruped {
-            print("AudioViewModel: Interruped")
-            self.audioPlayer.stopPlaying()
+            print("VideoViewModel: Interruped")
+            self.cameraLivePlayer.stopPlaying()
             return
         }
         
         guard let data = receive.data else {
-            print("AudioViewModel: data is emptry!")
+            print("VideoViewModel: data is emptry!")
             return
         }
 
         if let audioData = Data(base64Encoded: data) {
-            self.audioPlayer.startPlaying(data: audioData) { buffer in
+            self.cameraLivePlayer.startPlaying(data: audioData) { buffer in
                 DispatchQueue.main.async {
                     self.audioLevel = self.calculateAudioLevel(from: buffer)
                 }

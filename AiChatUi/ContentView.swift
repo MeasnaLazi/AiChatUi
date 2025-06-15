@@ -30,33 +30,34 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationView {
-            
-            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
-                switch tapType {
-                case .send:
-                    onSend()
-                case .voice:
-                    print("TODO: Voice")
-                    self.isShowVoice.toggle()
-                case .stop:
-                    print("TODO: Stop")
-                    chatViewModel.stopAnswering()
-                }
-            }
-            .sheet(isPresented: $isShowVoice) {
-//                AudioView(sessionId: "lazi_session")
-                AudioView(session: chatViewModel.session!)
-            }
-            .aiChatTheme(aiChattheme)
-            .navigationTitle("Agent Chat")
-            .navigationBarTitleDisplayMode(.inline)
-            .onAppear() {
-                Task {
-                    await chatViewModel.onInitialize()
-                }
-            }
-        }
+        VideoView(sessionId: "lazi_session")
+//        NavigationView {
+//            
+//            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
+//                switch tapType {
+//                case .send:
+//                    onSend()
+//                case .voice:
+//                    print("TODO: Voice")
+//                    self.isShowVoice.toggle()
+//                case .stop:
+//                    print("TODO: Stop")
+//                    chatViewModel.stopAnswering()
+//                }
+//            }
+//            .sheet(isPresented: $isShowVoice) {
+////                AudioView(sessionId: "lazi_session")
+//                AudioView(session: chatViewModel.session!)
+//            }
+//            .aiChatTheme(aiChattheme)
+//            .navigationTitle("Agent Chat")
+//            .navigationBarTitleDisplayMode(.inline)
+//            .onAppear() {
+//                Task {
+//                    await chatViewModel.onInitialize()
+//                }
+//            }
+//        }
     }
 }
 

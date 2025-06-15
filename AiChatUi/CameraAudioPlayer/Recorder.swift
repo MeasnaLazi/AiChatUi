@@ -39,11 +39,22 @@ class Recorder: NSObject {
     }
 
     func start() {
-        audioQueue.async { [weak self] in
-            guard let self = self else { return }
-            print("Recorder: Starting...")
+        checkPermissionsAndStartRunning()
+    }
+    
+    private func checkPermissionsAndStartRunning() {
+        AVAudioApplication.requestRecordPermission { granted in
+            guard granted else {
+                print("Microphone permission denied.")
+                return
+            }
+            
+            self.audioQueue.async { [weak self] in
+                guard let self = self else { return }
+                print("Recorder: Starting...")
 
-            self.setupRecordingUnit()
+                self.setupRecordingUnit()
+            }
         }
     }
 
