@@ -20,18 +20,8 @@ class AudioViewModel: ObservableObject {
     
     private let audioPlayer: AudioPlayer = AudioPlayerImp()
     
-    func startConnection(sessionId: String) async {
-        guard let webSocket = try? await runRepository.runCustomLive(sessionId: sessionId, query: ["is_audio" : "true"]) else {
-            print("AudioViewModel: Can not create webSocket!")
-            return
-        }
-        self.webSocket = webSocket
-        await webSocket.connect()
-        startListeningToWebSocket()
-    }
-    
-//    func startConnection(session: Session) async {
-//        guard let webSocket = try? await runRepository.runLive(session: session) else {
+//    func startConnection(sessionId: String) async {
+//        guard let webSocket = try? await runRepository.runCustomLive(sessionId: sessionId, query: ["is_audio" : "true"]) else {
 //            print("AudioViewModel: Can not create webSocket!")
 //            return
 //        }
@@ -39,6 +29,16 @@ class AudioViewModel: ObservableObject {
 //        await webSocket.connect()
 //        startListeningToWebSocket()
 //    }
+    
+    func startConnection(session: Session) async {
+        guard let webSocket = try? await runRepository.runLive(session: session) else {
+            print("AudioViewModel: Can not create webSocket!")
+            return
+        }
+        self.webSocket = webSocket
+        await webSocket.connect()
+        startListeningToWebSocket()
+    }
 
     private func startListeningToWebSocket() {
         guard let webSocket = self.webSocket else {
@@ -88,7 +88,8 @@ class AudioViewModel: ObservableObject {
         
         audioPlayer.startRecording { data in
             print("AudioViewModel: Sending data...")
-            let dataString = self.createSendString(data: data)
+//            let dataString = self.createSendString(data: data)
+            let dataString = self.createSendStringRunLive(data: data)
             Task {
                 try? await webSocket.send(string: dataString)
             }
@@ -134,6 +135,26 @@ class AudioViewModel: ObservableObject {
     private func createSendString(data: Data) -> String {
         let base64 = data.base64EncodedString()
         let payload: [String: String] = ["mime_type": "audio/pcm", "data": base64]
+        let encoder = JSONEncoder()
+
+        encoder.outputFormatting = .prettyPrinted
+        guard let jsonData = try? encoder.encode(payload) else {
+            print("AudioViewModel: Can not encode payload")
+            return ""
+        }
+        
+        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+            print("AudioViewModel: Can not convert to string")
+            return ""
+        }
+        
+        return jsonString
+    }
+    
+    private func createSendStringRunLive(data: Data) -> String {
+        let base64 = data.base64EncodedString()
+        let blob = ["mime_type": "audio/pcm", "data": base64]
+        let payload = ["blob": blob]
         let encoder = JSONEncoder()
 
         encoder.outputFormatting = .prettyPrinted

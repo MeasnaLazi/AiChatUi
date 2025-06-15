@@ -45,7 +45,6 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $isShowVoice) {
-//                AudioView(sessionId: "lazi_session")
                 AudioView(session: chatViewModel.session!)
             }
             .aiChatTheme(aiChattheme)

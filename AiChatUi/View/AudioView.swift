@@ -52,7 +52,7 @@ struct AudioView: View {
         .padding(.top)
         .onAppear {
             Task {
-                await viewModel.startConnection(sessionId: session.id)
+                await viewModel.startConnection(session: session)
             }
         }
         .onDisappear {

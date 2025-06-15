@@ -53,7 +53,7 @@ enum RunApi : Requestable {
                 "app_name": session.appName,
                 "user_id": session.userId,
                 "session_id": session.id,
-//                "modalities": "AUDIO"
+                "modalities": "AUDIO"
             ]
             return .query(query)
         }
