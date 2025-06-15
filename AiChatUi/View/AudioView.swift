@@ -10,7 +10,7 @@ import SwiftUI
 struct AudioView: View {
     
     @StateObject private var viewModel = AudioViewModel()
-    let sessionId: String
+    let session: Session
 
     var body: some View {
         ZStack(alignment: .center)  {
@@ -52,7 +52,7 @@ struct AudioView: View {
         .padding(.top)
         .onAppear {
             Task {
-                await viewModel.startConnection(sessionId: sessionId)
+                await viewModel.startConnection(sessionId: session.id)
             }
         }
         .onDisappear {

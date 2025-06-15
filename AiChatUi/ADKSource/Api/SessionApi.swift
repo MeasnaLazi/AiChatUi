@@ -8,7 +8,7 @@ import Foundation
 
 enum SessionApi : Requestable {
     var requestURL: URL {
-        return URL(string: "http://192.168.1.89:8000/apps/airbnb")!
+        return URL(string: Const().API_END_POINT)!
     }
     
     var path: String? {
@@ -24,7 +24,7 @@ enum SessionApi : Requestable {
             user = u
             session = s
         }
-        return "/users/\(user)/sessions/\(session)"
+        return "/apps/airbnb/users/\(user)/sessions/\(session)"
     }
     
     var httpMethod: HTTPMethod {

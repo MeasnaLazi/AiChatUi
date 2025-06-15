@@ -8,9 +8,10 @@
 import Foundation
 
 protocol RunRepository {
-    func runLive(sessionId: String, query: [String: String]) async throws -> WebSocket
-    func runSSE(data: Data) async throws -> AsyncThrowingStream<Event, Error>
     func run(data: Data) async throws -> [Event]
+    func runSSE(data: Data) async throws -> AsyncThrowingStream<Event, Error>
+    func runCustomLive(sessionId: String, query: [String: String]) async throws -> WebSocket
+    func runLive(session: Session) async throws -> WebSocket
 }
 
 struct RunRepositoryImp : RunRepository, BaseRepository {
@@ -20,15 +21,19 @@ struct RunRepositoryImp : RunRepository, BaseRepository {
         self.requestExecutor = requestExecute
     }
     
-    func runLive(sessionId: String, query: [String: String]) async throws -> WebSocket {
-        try await createWebSocket(RunApi.runLive(sessionId: sessionId, query: query))
+    func run(data: Data) async throws -> [Event] {
+        try await execute(RunApi.run(data: data))
     }
     
     func runSSE(data: Data) async throws -> AsyncThrowingStream<Event, Error> {
         try await executeStream(RunApi.runSSE(data: data))
     }
     
-    func run(data: Data) async throws -> [Event] {
-        try await execute(RunApi.run(data: data))
+    func runCustomLive(sessionId: String, query: [String: String]) async throws -> WebSocket {
+        try await createWebSocket(RunApi.runLiveCustom(sessionId: sessionId, query: query))
+    }
+    
+    func runLive(session: Session) async throws -> WebSocket {
+        try await createWebSocket(RunApi.runLive(session: session))
     }
 }

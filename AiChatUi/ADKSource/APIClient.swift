@@ -70,14 +70,14 @@ struct APIClient: RequestExecutor {
                 let textData = Data("true".utf8)
                 return try T.decode(textData)
             }
-//            print("data: \(String(describing: String(data: data, encoding: .utf8)))")
+            print("APIClient: data - \(String(describing: String(data: data, encoding: .utf8)))")
             return try T.decode(data)
             
         } catch let decodingError as DecodingError {
-            print("ApiClient decodingError: \(decodingError.localizedDescription)")
+            print("APIClient: decodingError - \(decodingError.localizedDescription)")
             throw APIError.decodingError(decodingError)
         } catch {
-            print("ApiClient error: \(error.localizedDescription)")
+            print("APIClient: error - \(error.localizedDescription)")
             throw error
         }
     }
@@ -99,7 +99,7 @@ struct APIClient: RequestExecutor {
                         
                         for try await byte in bytes {
                             if Task.isCancelled {
-                                print("Tasl streaming cancelled.")
+                                print("APIClient: Task streaming cancelled.")
                                 throw APIError.userCancelledStream
                             }
                             if errorBody == nil {
@@ -117,7 +117,7 @@ struct APIClient: RequestExecutor {
                     
                     for try await line in bytes.lines {
                         if Task.isCancelled {
-                            print("Tasl streaming cancelled.")
+                            print("APIClient: Task streaming cancelled.")
                             throw APIError.userCancelledStream
                         }
                         
@@ -128,14 +128,14 @@ struct APIClient: RequestExecutor {
                                 return
                             }
                             guard let jsonData = dataString.data(using: .utf8) else {
-                                print("Warning: Could not convert string to data: \(dataString)")
+                                print("APIClient: Warning - Could not convert string to data: \(dataString)")
                                 continue
                             }
                             do {
                                 let streamResponse = try T.decode(jsonData)
                                 continuation.yield(streamResponse)
                             } catch {
-                                print("Warning: Decoding stream chunk failed: \(error). Chunk: \(dataString)")
+                                print("APIClient: Warning - Decoding stream chunk failed: \(error). Chunk: \(dataString)")
                             }
                         }
                     }
@@ -143,11 +143,11 @@ struct APIClient: RequestExecutor {
                     continuation.finish()
                     
                 } catch is CancellationError {
-                    print("Catch: Streaming cancelled.")
+                    print("APIClient: Catch - Streaming cancelled.")
                     continuation.finish(throwing: APIError.userCancelledStream)
                 }
                 catch APIError.userCancelledStream  {
-                    print("Catch: APIError.userCancelledStream.")
+                    print("APIClient: Catch - APIError.userCancelledStream.")
                     continuation.finish(throwing: APIError.userCancelledStream)
                 }
                 catch {
@@ -158,12 +158,12 @@ struct APIClient: RequestExecutor {
             continuation.onTermination = { termination in
                 switch termination {
                 case .cancelled:
-                    print("Stream was cancelled by the user")
+                    print("APIClient: Stream was cancelled by the user")
                     networkTask.cancel()
                 case .finished:
-                    print("Stream finished normally")
+                    print("APIClient: Stream finished normally")
                 @unknown default:
-                    print("Unknown termination")
+                    print("APIClient: Unknown termination")
                 }
             }
         }
@@ -203,7 +203,7 @@ struct APIClient: RequestExecutor {
             }
         }
         
-        print("urlRequest:\(urlRequest)")
+        print("APIClient: urlRequest:\(urlRequest)")
         return urlRequest
     }
 }

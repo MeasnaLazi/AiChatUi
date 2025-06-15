@@ -7,12 +7,15 @@
 import Foundation
 
 enum RunApi : Requestable {
+    
     var requestURL: URL {
         switch self {
+        case .runLiveCustom:
+            return URL(string: Const().SOCKET_END_POINT)!
         case .runLive:
-            return URL(string: "ws://192.168.1.89:8000")!
+            return URL(string: Const().SOCKET_END_POINT)!
         default:
-            return URL(string: "http://192.168.1.89:8000")!
+            return URL(string: Const().API_END_POINT)!
         }
     }
     
@@ -22,8 +25,10 @@ enum RunApi : Requestable {
            return "/run_sse"
         case .run:
            return "/run"
-        case .runLive(let sessionId, _):
+        case .runLiveCustom(let sessionId, _):
            return "/ws/\(sessionId)"
+        case .runLive:
+            return "/run_live"
         }
     }
     
@@ -41,9 +46,16 @@ enum RunApi : Requestable {
             return .body(data)
         case .run(let data):
             return .body(data)
-        case .runLive(_, let query):
+        case .runLiveCustom(_, let query):
             return .query(query)
-        
+        case .runLive(let session):
+            let query = [
+                "app_name": session.appName,
+                "user_id": session.userId,
+                "session_id": session.id,
+//                "modalities": "AUDIO"
+            ]
+            return .query(query)
         }
     }
     
@@ -53,5 +65,6 @@ enum RunApi : Requestable {
     
     case runSSE(data: Data)
     case run(data: Data)
-    case runLive(sessionId: String, query: [String: String])
+    case runLive(session: Session) // different json format from runLiveCustom when send and receive
+    case runLiveCustom(sessionId: String, query: [String: String])
 }

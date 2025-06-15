@@ -21,7 +21,7 @@ class AudioViewModel: ObservableObject {
     private let audioPlayer: AudioPlayer = AudioPlayerImp()
     
     func startConnection(sessionId: String) async {
-        guard let webSocket = try? await runRepository.runLive(sessionId: sessionId, query: ["is_audio" : "true"]) else {
+        guard let webSocket = try? await runRepository.runCustomLive(sessionId: sessionId, query: ["is_audio" : "true"]) else {
             print("AudioViewModel: Can not create webSocket!")
             return
         }
@@ -29,6 +29,16 @@ class AudioViewModel: ObservableObject {
         await webSocket.connect()
         startListeningToWebSocket()
     }
+    
+//    func startConnection(session: Session) async {
+//        guard let webSocket = try? await runRepository.runLive(session: session) else {
+//            print("AudioViewModel: Can not create webSocket!")
+//            return
+//        }
+//        self.webSocket = webSocket
+//        await webSocket.connect()
+//        startListeningToWebSocket()
+//    }
 
     private func startListeningToWebSocket() {
         guard let webSocket = self.webSocket else {

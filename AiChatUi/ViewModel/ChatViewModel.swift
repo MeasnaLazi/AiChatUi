@@ -10,7 +10,7 @@ class ChatViewModel: BaseChatViewModel {
     
     private let adkRepository: SessionRepository = SessionRepositoryImp(requestExecute: APIClient())
     private let runRepository: RunRepository = RunRepositoryImp(requestExecute: APIClient())
-    private var session: Session?
+    var session: Session?
     var streamTask: Task<Void, Never>? = nil
     
     func onInitialize() async {
@@ -20,6 +20,8 @@ class ChatViewModel: BaseChatViewModel {
                 self.session = try await adkRepository.startSession(user: "lazi", session: "lazi_session")
                 return
             }
+            
+//            print("ChatViewModel: session - \(session)")
             
             self.session = session
             self.extractDataAndSetToList(session: session)
@@ -59,8 +61,8 @@ class ChatViewModel: BaseChatViewModel {
                     let isPartial = item.partial ?? false
                     super.receiveMessageStream(text: text, isPartial: isPartial)
                 }
-                print("stream count: \(count)")
-                print("agents count: \(groupMessages.last?.agents.count ?? 0)")
+                print("ChatViewModel: stream count: \(count)")
+                print("ChatViewModel: agents count: \(groupMessages.last?.agents.count ?? 0)")
                 stopAnswering()
             } catch {
                 debugPrint(error)
@@ -75,7 +77,7 @@ class ChatViewModel: BaseChatViewModel {
         let jsonData = session.buildNewMesssageDictionary(text: content).toData()
         do {
             let events = try await runRepository.run(data: jsonData)
-            print("events: \(events.count)")
+            print("ChatViewModel: events: \(events.count)")
             for event in events {
                 super.receiveMessage(text: event.content.parts.first?.text ?? "")
             }
