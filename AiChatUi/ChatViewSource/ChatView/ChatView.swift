@@ -32,16 +32,15 @@ public struct ChatView: View {
     }
     
     public var body: some View {
-              
-            VStack {
-                listView
-                    .onTapGesture {
-                        isFocused = false
-                    }
-                    .animation(.easeInOut, value: viewModel.groupMessages)
-                inputView
-                    .focused($isFocused)
-            }
+        VStack {
+            listView
+                .onTapGesture {
+                    isFocused = false
+                }
+                .animation(.easeInOut, value: viewModel.groupMessages)
+            inputView
+                .focused($isFocused)
+        }
     }
     
     @ViewBuilder
@@ -98,7 +97,6 @@ public struct ChatView: View {
     
     @ViewBuilder
     private var inputView: some View {
-        
         VStack {
             CustomTextEditor(text: $inputText) {
                 onButtonClick(tapType: .send)
@@ -107,7 +105,6 @@ public struct ChatView: View {
             .padding(.top, 10)
             .padding(.bottom, 6)
             
-    
             HStack {
                 Button(action: {
                     print("file clicked!")
