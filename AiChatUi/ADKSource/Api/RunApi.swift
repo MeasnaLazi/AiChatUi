@@ -6,7 +6,7 @@
 //
 import Foundation
 
-enum RunApi : Requestable {
+enum RunApi: Requestable {
     
     var requestURL: URL {
         switch self {

@@ -21,6 +21,8 @@ public struct ChatView: View {
     @ObservedObject private var viewModel: BaseChatViewModel
     @Binding private var inputText: String
     
+    @FocusState private var isFocused: Bool
+    
     var onButtonTapped: ((ButtonTapType) -> ())?
     
     public init(viewModel: BaseChatViewModel, inputText: Binding<String>, onButtonTapped: ((ButtonTapType) -> ())? = nil) {
@@ -30,11 +32,16 @@ public struct ChatView: View {
     }
     
     public var body: some View {
-        VStack {
-            listView
-                .animation(.easeInOut, value: viewModel.groupMessages)
-            inputView
-        }
+              
+            VStack {
+                listView
+                    .onTapGesture {
+                        isFocused = false
+                    }
+                    .animation(.easeInOut, value: viewModel.groupMessages)
+                inputView
+                    .focused($isFocused)
+            }
     }
     
     @ViewBuilder
@@ -91,6 +98,7 @@ public struct ChatView: View {
     
     @ViewBuilder
     private var inputView: some View {
+        
         VStack {
             CustomTextEditor(text: $inputText) {
                 onButtonClick(tapType: .send)
@@ -98,6 +106,7 @@ public struct ChatView: View {
             .padding([.leading, .trailing], 12)
             .padding(.top, 10)
             .padding(.bottom, 6)
+            
     
             HStack {
                 Button(action: {
