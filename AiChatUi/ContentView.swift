@@ -32,7 +32,6 @@ struct ContentView: View {
     var body: some View {
         VideoView(sessionId: "lazi_session")
 //        NavigationView {
-//            
 //            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
 //                switch tapType {
 //                case .send:
@@ -46,8 +45,9 @@ struct ContentView: View {
 //                }
 //            }
 //            .sheet(isPresented: $isShowVoice) {
-////                AudioView(sessionId: "lazi_session")
-//                AudioView(session: chatViewModel.session!)
+//                if let session = chatViewModel.session {
+//                    AudioView(session: session)
+//                }
 //            }
 //            .aiChatTheme(aiChattheme)
 //            .navigationTitle("Agent Chat")
