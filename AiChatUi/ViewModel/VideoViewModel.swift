@@ -75,7 +75,7 @@ class VideoViewModel: ObservableObject {
         isStreaming = true
         
         cameraLivePlayer.startRecording { data in
-//            print("VideoViewModel: Voice Sending data...")
+            print("VideoViewModel: Voice Sending data...")
             let dataString = self.createSendString(data: data, type: "audio/pcm")
             Task {
                 try? await webSocket.send(string: dataString)

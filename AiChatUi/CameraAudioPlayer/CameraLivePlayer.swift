@@ -22,11 +22,9 @@ class CameraLivePlayerImp : CameraLivePlayer {
     typealias RecorderCallBack = (Data)->()
     typealias VideoCallBack = (Data)->()
     
-    private let player = Player()
-    private let recorder = Recorder()
+    private let audioPlayer = AudioPlayerImp()
     private let videoCapturer = VideoCapturer()
     
-    private var recorderCallBack: RecorderCallBack?
     private var videoCallBack: VideoCallBack?
     
     var captureSession: AVCaptureSession {
@@ -35,20 +33,19 @@ class CameraLivePlayerImp : CameraLivePlayer {
     
     init() {
         setUpSession()
-        recorder.delegate = self
         videoCapturer.delegate = self
     }
     
     deinit {
-        player.cleanUp()
-        recorder.cleanUp()
+        audioPlayer.stopRecording()
+        audioPlayer.stopPlaying()
         videoCapturer.cleanUp()
         
         removeSession()
     }
     
     func startPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?) {
-        player.play(data: data) { buffer in
+        audioPlayer.startPlaying(data: data) { buffer in
             if let buffering {
                 buffering(buffer)
             }
@@ -56,19 +53,20 @@ class CameraLivePlayerImp : CameraLivePlayer {
     }
     
     func stopPlaying() {
-        player.stop()
+        audioPlayer.stopPlaying()
     }
     
     func startRecording(voiceRecording: @escaping RecorderCallBack, vedioRecording: @escaping VideoCallBack) {
-        recorderCallBack = voiceRecording
         videoCallBack = vedioRecording
         
-        recorder.start()
+        audioPlayer.startRecording { data in
+            voiceRecording(data)
+        }
     }
     
     func stopRecording() {
-        recorder.stop()
-        resetRecordingCallBack()
+        audioPlayer.stopRecording()
+        videoCallBack = nil
     }
     
     func startCamera() {
@@ -96,19 +94,6 @@ class CameraLivePlayerImp : CameraLivePlayer {
             try audioSession.setActive(false)
         } catch {
             print("CameraLivePlayerImp: Failed to deactivate audio session - \(error)")
-        }
-    }
-    
-    private func resetRecordingCallBack(){
-        recorderCallBack = nil
-        videoCallBack = nil
-    }
-}
-
-extension CameraLivePlayerImp: RecorderDelegate {
-    func recording(data: Data) {
-        if let recorderCallBack {
-            recorderCallBack(data)
         }
     }
 }
