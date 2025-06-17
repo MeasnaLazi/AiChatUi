@@ -13,41 +13,14 @@ struct VideoView: View {
     let sessionId: String
 
     var body: some View {
-        ZStack(alignment: .center)  {
+        VStack {
+            statusView
             
             CameraPreviewView(session: viewModel.cameraLivePlayer.captureSession)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.red)
-                .ignoresSafeArea()
             
-            Button(action: {
-                if viewModel.isStreaming {
-                    viewModel.stopConversation()
-                } else {
-                    Task {
-                        await viewModel.startConversation()
-                    }
-                }
-            }) {
-                    
-            Image(systemName: viewModel.isStreaming ? "stop.fill" : "play.fill")
-                    .font(.system(size: 24))
-                    .padding(12)
-                    .background(Color(hex: 0x1e1e1e))
-                    .foregroundColor(Color.white)
-                    .clipShape(Circle())
-            }
+            controlView
             
-            VStack {
-                HStack {
-                    Spacer()
-                    Text(viewModel.webSocketStatus)
-                        .foregroundColor(statusFG())
-                    Spacer()
-                }
-                
-                Spacer()
-            }
         }
         .padding(.top)
         .onAppear {
@@ -73,6 +46,64 @@ struct VideoView: View {
         default:
             return .blue
         }
+    }
+    
+    @ViewBuilder
+    private var statusView: some View {
+        HStack {
+            Spacer()
+            Text(viewModel.webSocketStatus)
+                .foregroundColor(statusFG())
+                .padding(.bottom, 4)
+            Spacer()
+        }
+        .background(.black)
+    }
+    
+    @ViewBuilder
+    private var controlView: some View {
+        HStack(alignment: .center) {
+            Button(action: {
+                print("flash")
+            }) {
+                Image(systemName: viewModel.isStreaming ? "bolt.fill" : "bolt.slash.fill")
+                    .font(.system(size: 24))
+                    .padding(10)
+                    .background(Color(hex: 0x1e1e1e))
+                    .foregroundColor(Color.white)
+                    .clipShape(Circle())
+            }
+            Spacer()
+            Button(action: {
+                if viewModel.isStreaming {
+                    viewModel.stopConversation()
+                } else {
+                    Task {
+                        await viewModel.startConversation()
+                    }
+                }
+            }) {
+                Image(systemName: viewModel.isStreaming ? "stop.fill" : "play.fill")
+                    .font(.system(size: 30))
+                    .padding(20)
+                    .background(Color(hex: 0x1e1e1e))
+                    .foregroundColor(Color.white)
+                    .clipShape(Circle())
+            }
+            Spacer()
+            Button(action: {
+                print("switch")
+            }) {
+                Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
+                    .font(.system(size: 24))
+                    .padding(10)
+                    .background(Color(hex: 0x1e1e1e))
+                    .foregroundColor(Color.white)
+                    .clipShape(Circle())
+            }
+        }
+        .padding()
+        .background(.black)
     }
 }
 

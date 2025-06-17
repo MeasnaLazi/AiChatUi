@@ -46,7 +46,7 @@ class VideoViewModel: ObservableObject {
                     case .disconnected:
                         print("VideoViewModel: Disconnected")
                         self.webSocketStatus = "Disconnected"
-                        self.endConnection()
+                        self.cleanUp()
                     case .data(let data):
                         print("VideoViewModel: ...receiving data")
                         self.handleReceiveSound(data: data)

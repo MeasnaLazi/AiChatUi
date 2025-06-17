@@ -56,7 +56,7 @@ class AudioViewModel: ObservableObject {
                     case .disconnected:
                         print("AudioViewModel: Disconnected")
                         self.webSocketStatus = "Disconnected"
-                        self.endConnection()
+                        self.cleanUp()
                     case .data(let data):
                         print("AudioViewModel: ...receiving data")
                         self.handleReceiveSound(data: data)

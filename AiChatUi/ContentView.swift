@@ -37,17 +37,18 @@ struct ContentView: View {
 //                case .send:
 //                    onSend()
 //                case .voice:
-//                    print("TODO: Voice")
+//                    print("ContentView: Voice")
+//                    guard let _ = chatViewModel.session else {
+//                        return
+//                    }
 //                    self.isShowVoice.toggle()
 //                case .stop:
-//                    print("TODO: Stop")
+//                    print("ContentView: Stop")
 //                    chatViewModel.stopAnswering()
 //                }
 //            }
 //            .sheet(isPresented: $isShowVoice) {
-//                if let session = chatViewModel.session {
-//                    AudioView(session: session)
-//                }
+//                AudioView(session: chatViewModel.session!)
 //            }
 //            .aiChatTheme(aiChattheme)
 //            .navigationTitle("Agent Chat")
