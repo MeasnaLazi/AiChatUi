@@ -7,10 +7,10 @@
 import AVFoundation
 
 protocol AudioPlayer {
-    func startPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?)
-    func stopPlaying()
-    func startRecording(recording: @escaping (Data)->())
-    func stopRecording()
+    func startAudioPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?)
+    func stopAudioPlaying()
+    func startAudioRecording(voiceRecording: @escaping (Data)->())
+    func stopAudioRecording()
 }
 
 class AudioPlayerImp: AudioPlayer, RecorderDelegate {
@@ -32,7 +32,7 @@ class AudioPlayerImp: AudioPlayer, RecorderDelegate {
         removeSession()
     }
     
-    func startPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?) {
+    func startAudioPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?) {
         player.play(data: data) { buffer in
             if let buffering {
                 buffering(buffer)
@@ -40,16 +40,16 @@ class AudioPlayerImp: AudioPlayer, RecorderDelegate {
         }
     }
     
-    func stopPlaying() {
+    func stopAudioPlaying() {
         player.stop()
     }
     
-    func startRecording(recording: @escaping RecorderCallBack) {
-        recorderCallBack = recording
+    func startAudioRecording(voiceRecording: @escaping RecorderCallBack) {
+        recorderCallBack = voiceRecording
         recorder.start()
     }
     
-    func stopRecording() {
+    func stopAudioRecording() {
         recorder.stop()
     }
     

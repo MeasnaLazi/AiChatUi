@@ -21,8 +21,8 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     }
     
     private let captureSession = AVCaptureSession()
-    private let sessionQueue = DispatchQueue(label: "com.example.video.session.queue")
-    private let videoOutputQueue = DispatchQueue(label: "com.example.video.output.queue")
+    private let sessionQueue = DispatchQueue(label: "dev.measna.video.session.queue")
+    private let videoOutputQueue = DispatchQueue(label: "dev.measna.video.output.queue")
 
     override init() {
         super.init()
@@ -42,10 +42,6 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
             self.captureSession.stopRunning()
             print("VideoCapturer: Session stopped.")
         }
-    }
-    
-    func cleanUp() {
-        stop()
     }
 
     private func checkPermissionsAndStartRunning() {

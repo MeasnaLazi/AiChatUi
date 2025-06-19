@@ -15,7 +15,7 @@ class Recorder: NSObject {
 
     weak var delegate: RecorderDelegate?
 
-    private let audioQueue = DispatchQueue(label: "echo.cancelling.audio.manager.queue")
+    private let audioQueue = DispatchQueue(label: "dev.measna.echo.cancelling.audio.manager.queue")
     private var isCapturing = false
     
     private let recordingFormat: AudioStreamBasicDescription

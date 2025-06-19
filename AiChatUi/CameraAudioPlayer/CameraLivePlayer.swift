@@ -6,13 +6,10 @@
 //
 import AVFoundation
 
-protocol CameraLivePlayer {
+protocol CameraLivePlayer: AudioPlayer {
     var captureSession: AVCaptureSession { get }
-    
-    func startPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?)
-    func stopPlaying()
-    func startRecording(voiceRecording: @escaping (Data)->(), vedioRecording: @escaping (Data)->())
-    func stopRecording()
+    func startVideoRecording(vedioRecording: @escaping (Data)->())
+    func stopVideoRecording()
     func startCamera()
     func stopCamera()
 }
@@ -32,41 +29,35 @@ class CameraLivePlayerImp : CameraLivePlayer {
     }
     
     init() {
-        setUpSession()
         videoCapturer.delegate = self
     }
     
     deinit {
-        audioPlayer.stopRecording()
-        audioPlayer.stopPlaying()
-        videoCapturer.cleanUp()
-        
-        removeSession()
+        audioPlayer.stopAudioRecording()
+        audioPlayer.stopAudioPlaying()
+        videoCapturer.stop()
     }
     
-    func startPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?) {
-        audioPlayer.startPlaying(data: data) { buffer in
+    func startAudioPlaying(data: Data, buffering: ((AVAudioPCMBuffer)->())?) {
+        audioPlayer.startAudioPlaying(data: data) { buffer in
             if let buffering {
                 buffering(buffer)
             }
         }
     }
     
-    func stopPlaying() {
-        audioPlayer.stopPlaying()
+    func stopAudioPlaying() {
+        audioPlayer.stopAudioPlaying()
     }
     
-    func startRecording(voiceRecording: @escaping RecorderCallBack, vedioRecording: @escaping VideoCallBack) {
-        videoCallBack = vedioRecording
-        
-        audioPlayer.startRecording { data in
+    func startAudioRecording(voiceRecording: @escaping (Data) -> ()) {
+        audioPlayer.startAudioRecording { data in
             voiceRecording(data)
         }
     }
     
-    func stopRecording() {
-        audioPlayer.stopRecording()
-        videoCallBack = nil
+    func stopAudioRecording() {
+        audioPlayer.stopAudioRecording()
     }
     
     func startCamera() {
@@ -77,24 +68,12 @@ class CameraLivePlayerImp : CameraLivePlayer {
         videoCapturer.stop()
     }
     
-    private func setUpSession() {
-        do {
-            let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetooth])
-            try audioSession.setActive(true)
-    
-        } catch {
-            print("CameraLivePlayerImp: Failed to start - \(error)")
-        }
+    func startVideoRecording(vedioRecording: @escaping (Data) -> ()) {
+        videoCallBack = vedioRecording
     }
     
-    private func removeSession() {
-        do {
-            let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setActive(false)
-        } catch {
-            print("CameraLivePlayerImp: Failed to deactivate audio session - \(error)")
-        }
+    func stopVideoRecording() {
+        videoCallBack = nil
     }
 }
 

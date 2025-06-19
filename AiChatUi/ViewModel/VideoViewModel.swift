@@ -74,13 +74,15 @@ class VideoViewModel: ObservableObject {
         }
         isStreaming = true
         
-        cameraLivePlayer.startRecording { data in
+        cameraLivePlayer.startAudioRecording { data in
             print("VideoViewModel: Voice Sending data...")
             let dataString = self.createSendString(data: data, type: "audio/pcm")
             Task {
                 try? await webSocket.send(string: dataString)
             }
-        } vedioRecording: {data in
+        }
+        
+        cameraLivePlayer.startVideoRecording { data in
             print("VideoViewModel: Frame Sending data...")
             let dataString = self.createSendString(data: data, type: "image/jpeg")
             Task {
@@ -92,8 +94,10 @@ class VideoViewModel: ObservableObject {
     func stopConversation() {
         if isStreaming {
             isStreaming = false
-            cameraLivePlayer.stopPlaying()
-            cameraLivePlayer.stopRecording()
+            
+            cameraLivePlayer.stopAudioRecording()
+            cameraLivePlayer.stopAudioPlaying()
+            cameraLivePlayer.stopVideoRecording()
         }
     }
     
@@ -174,7 +178,7 @@ class VideoViewModel: ObservableObject {
         
         if let interruped = receive.isInterruped, interruped {
             print("VideoViewModel: Interruped")
-            self.cameraLivePlayer.stopPlaying()
+            self.cameraLivePlayer.stopAudioPlaying()
             return
         }
         
@@ -184,7 +188,7 @@ class VideoViewModel: ObservableObject {
         }
 
         if let audioData = Data(base64Encoded: data) {
-            self.cameraLivePlayer.startPlaying(data: audioData) { buffer in
+            self.cameraLivePlayer.startAudioPlaying(data: audioData) { buffer in
                 DispatchQueue.main.async {
                     self.audioLevel = self.calculateAudioLevel(from: buffer)
                 }

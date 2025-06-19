@@ -84,7 +84,7 @@ class AudioViewModel: ObservableObject {
         }
         isStreaming = true
         
-        audioPlayer.startRecording { data in
+        audioPlayer.startAudioRecording { data in
             print("AudioViewModel: Sending data...")
             let dataString = self.createSendString(data: data)
             Task {
@@ -96,8 +96,8 @@ class AudioViewModel: ObservableObject {
     func stopConversation() {
         if isStreaming {
             isStreaming = false
-            audioPlayer.stopPlaying()
-            audioPlayer.stopRecording()
+            audioPlayer.stopAudioPlaying()
+            audioPlayer.stopAudioRecording()
         }
     }
     
@@ -178,7 +178,7 @@ class AudioViewModel: ObservableObject {
         
         if let interruped = receive.isInterruped, interruped {
             print("AudioViewModel: Interruped")
-            self.audioPlayer.stopPlaying()
+            self.audioPlayer.stopAudioPlaying()
             return
         }
         
@@ -188,7 +188,7 @@ class AudioViewModel: ObservableObject {
         }
 
         if let audioData = Data(base64Encoded: data) {
-            self.audioPlayer.startPlaying(data: audioData) { buffer in
+            self.audioPlayer.startAudioPlaying(data: audioData) { buffer in
                 DispatchQueue.main.async {
                     self.audioLevel = self.calculateAudioLevel(from: buffer)
                 }
