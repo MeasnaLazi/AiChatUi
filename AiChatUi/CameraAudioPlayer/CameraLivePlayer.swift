@@ -12,6 +12,7 @@ protocol CameraLivePlayer: AudioPlayer {
     func stopVideoRecording()
     func startCamera()
     func stopCamera()
+    func switchCamera()
 }
 
 class CameraLivePlayerImp : CameraLivePlayer {
@@ -66,6 +67,10 @@ class CameraLivePlayerImp : CameraLivePlayer {
 
     func stopCamera() {
         videoCapturer.stop()
+    }
+    
+    func switchCamera() {
+        videoCapturer.switchCamera()
     }
     
     func startVideoRecording(vedioRecording: @escaping (Data) -> ()) {

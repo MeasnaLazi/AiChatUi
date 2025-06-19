@@ -23,9 +23,17 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     private let captureSession = AVCaptureSession()
     private let sessionQueue = DispatchQueue(label: "dev.measna.video.session.queue")
     private let videoOutputQueue = DispatchQueue(label: "dev.measna.video.output.queue")
+    
+    private var backCamera: AVCaptureDevice!
+    private var frontCamera: AVCaptureDevice!
+    private var backInput: AVCaptureInput!
+    private var frontInput: AVCaptureInput!
+    
+    private var isBackCamera = true
 
     override init() {
         super.init()
+        setCameraAndInput()
         setupCaptureSession()
     }
 
@@ -42,6 +50,16 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
             self.captureSession.stopRunning()
             print("VideoCapturer: Session stopped.")
         }
+    }
+    
+    func switchCamera() {
+        captureSession.beginConfiguration()
+        
+        captureSession.removeInput(isBackCamera ? backInput : frontInput)
+        captureSession.addInput(isBackCamera ? frontInput : backInput)
+        isBackCamera = !isBackCamera
+        
+        captureSession.commitConfiguration()
     }
 
     private func checkPermissionsAndStartRunning() {
@@ -66,15 +84,8 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         captureSession.beginConfiguration()
         captureSession.sessionPreset = .vga640x480
 
-        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let cameraInput = try? AVCaptureDeviceInput(device: camera) else {
-            print("VideoCapturer: FATAL - Could not create camera input.")
-            captureSession.commitConfiguration()
-            return
-        }
-        
-        if captureSession.canAddInput(cameraInput) {
-            captureSession.addInput(cameraInput)
+        if captureSession.canAddInput(backInput) {
+            captureSession.addInput(backInput)
         }
 
         let videoOutput = AVCaptureVideoDataOutput()
@@ -87,8 +98,32 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         
         captureSession.commitConfiguration()
+        isBackCamera = true
         
         print("VideoCapturer: Session configured successfully in init.")
+    }
+    
+    private func setCameraAndInput() {
+        if let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
+             backCamera = cameraDevice
+        } else {
+             fatalError("VideoCapturer: No back camera")
+        }
+        if let cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
+             frontCamera = cameraDevice
+        } else {
+             fatalError("VideoCapturer: No front camera")
+        }
+        if let input = try? AVCaptureDeviceInput(device: backCamera) {
+            backInput = input
+        } else {
+            fatalError("VideoCapturer: Issue with create input from back camera")
+        }
+        if let input = try? AVCaptureDeviceInput(device: frontCamera) {
+            frontInput = input
+        } else {
+            fatalError("VideoCapturer: Issue with create input from front camera")
+        }
     }
 
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {

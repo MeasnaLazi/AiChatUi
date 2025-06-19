@@ -93,6 +93,7 @@ struct VideoView: View {
             Spacer()
             Button(action: {
                 print("switch")
+                viewModel.cameraLivePlayer.switchCamera()
             }) {
                 Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
                     .font(.system(size: 24))
