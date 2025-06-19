@@ -10,6 +10,7 @@ import SwiftUI
 struct VideoView: View {
     
     @StateObject private var viewModel = VideoViewModel()
+    
     let sessionId: String
 
     var body: some View {
@@ -64,15 +65,16 @@ struct VideoView: View {
     private var controlView: some View {
         HStack(alignment: .center) {
             Button(action: {
-                print("flash")
+                viewModel.switchTorch()
             }) {
-                Image(systemName: viewModel.isStreaming ? "bolt.fill" : "bolt.slash.fill")
+                Image(systemName: viewModel.isTorchOn ? "bolt.slash.fill" : "bolt.fill")
                     .font(.system(size: 24))
                     .padding(10)
-                    .background(Color(hex: 0x1e1e1e))
-                    .foregroundColor(Color.white)
+                    .background(viewModel.isBackCamera ? Color(hex: 0x1e1e1e) : .black)
+                    .foregroundColor(viewModel.isBackCamera ? .white : .gray)
                     .clipShape(Circle())
             }
+            .disabled(!viewModel.isBackCamera)
             Spacer()
             Button(action: {
                 if viewModel.isStreaming {
@@ -92,8 +94,7 @@ struct VideoView: View {
             }
             Spacer()
             Button(action: {
-                print("switch")
-                viewModel.cameraLivePlayer.switchCamera()
+                viewModel.switchCamera()
             }) {
                 Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
                     .font(.system(size: 24))

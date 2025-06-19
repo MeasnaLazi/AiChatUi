@@ -30,6 +30,7 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     private var frontInput: AVCaptureInput!
     
     private var isBackCamera = true
+    private var isTorch = false
 
     override init() {
         super.init()
@@ -60,6 +61,22 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         isBackCamera = !isBackCamera
         
         captureSession.commitConfiguration()
+    }
+    
+    func switchTorch() {
+        guard let device = AVCaptureDevice.default(for: .video) else { return }
+        if device.hasTorch {
+            do {
+                try device.lockForConfiguration()
+                device.torchMode = isTorch ? .off : .on
+                isTorch = !isTorch
+                device.unlockForConfiguration()
+            } catch {
+                print("Torch could not be used")
+            }
+        } else {
+            print("Torch is not available")
+        }
     }
 
     private func checkPermissionsAndStartRunning() {
@@ -98,7 +115,6 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         
         captureSession.commitConfiguration()
-        isBackCamera = true
         
         print("VideoCapturer: Session configured successfully in init.")
     }

@@ -17,6 +17,8 @@ class VideoViewModel: ObservableObject {
     @Published var isStreaming = false
     @Published var webSocketStatus = "Connecting..."
     @Published var audioLevel: CGFloat = 0.0
+    @Published var isTorchOn = false
+    @Published var isBackCamera = true
     
     let cameraLivePlayer: CameraLivePlayer = CameraLivePlayerImp()
     
@@ -127,6 +129,20 @@ class VideoViewModel: ObservableObject {
         }
         self.webSocket = nil
         print("VideoViewModel: Connection cleaned up.")
+    }
+    
+    func switchCamera() {
+        if isBackCamera && isTorchOn {
+            switchTorch()
+        }
+        
+        cameraLivePlayer.switchCamera()
+        isBackCamera = !isBackCamera
+    }
+    
+    func switchTorch() {
+        cameraLivePlayer.switchTorch()
+        isTorchOn = !isTorchOn
     }
     
     private func createSendString(data: Data, type: String) -> String {
