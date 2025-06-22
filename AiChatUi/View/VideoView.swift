@@ -10,8 +10,7 @@ import SwiftUI
 struct VideoView: View {
     
     @StateObject private var viewModel = VideoViewModel()
-    
-    let sessionId: String
+    let session: Session
 
     var body: some View {
         VStack {
@@ -24,10 +23,11 @@ struct VideoView: View {
             
         }
         .padding(.top)
+        .background(.black)
         .onAppear {
             viewModel.cameraLivePlayer.startCamera()
             Task {
-                await viewModel.startConnection(sessionId: sessionId)
+                await viewModel.startConnection(sessionId: session.id)
             }
         }
         .onDisappear {

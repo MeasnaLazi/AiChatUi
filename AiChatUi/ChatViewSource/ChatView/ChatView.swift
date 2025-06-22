@@ -11,6 +11,7 @@ public enum ButtonTapType {
     case send
     case voice
     case stop
+    case video
 }
 
 public struct ChatView: View {
@@ -120,6 +121,15 @@ public struct ChatView: View {
                 Spacer()
                 
                 Button(action: {
+                    onButtonClick(tapType: .video)
+                }) {
+                    Image(systemName: "camera.aperture" )
+                        .font(.system(size: 18))
+                        .foregroundColor(theme.colors.inputButtonIconFG)
+                        .disabled(viewModel.isAnswering)
+                }
+                
+                Button(action: {
                     if viewModel.isAnswering {
                         viewModel.stopAnswering()
                         onButtonClick(tapType: .stop)
@@ -141,7 +151,7 @@ public struct ChatView: View {
                     } else {
                         if inputText.isEmpty {
                             Image(systemName: "waveform" )
-                                .font(.system(size: 16))
+                                .font(.system(size: 18))
                                 .foregroundColor(theme.colors.inputButtonIconFG)
                         } else {
                             Image(systemName: "arrow.up")

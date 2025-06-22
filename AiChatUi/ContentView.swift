@@ -13,6 +13,7 @@ struct ContentView: View {
     @StateObject private var chatViewModel = ChatViewModel()
     @State private var inputText: String = ""
     @State private var isShowVoice = false
+    @State private var isShowVideo = false
 
     var aiChattheme: AiChatTheme {
         colorScheme == .dark ? .dark : .light
@@ -30,35 +31,44 @@ struct ContentView: View {
     }
     
     var body: some View {
-        VideoView(sessionId: "lazi_session")
-//        NavigationView {
-//            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
-//                switch tapType {
-//                case .send:
-//                    onSend()
-//                case .voice:
-//                    print("ContentView: Voice")
-//                    guard let _ = chatViewModel.session else {
-//                        return
-//                    }
-//                    self.isShowVoice.toggle()
-//                case .stop:
-//                    print("ContentView: Stop")
-//                    chatViewModel.stopAnswering()
-//                }
-//            }
-//            .sheet(isPresented: $isShowVoice) {
-//                AudioView(session: chatViewModel.session!)
-//            }
-//            .aiChatTheme(aiChattheme)
-//            .navigationTitle("Agent Chat")
-//            .navigationBarTitleDisplayMode(.inline)
-//            .onAppear() {
-//                Task {
-//                    await chatViewModel.onInitialize()
-//                }
-//            }
-//        }
+        
+        NavigationView {
+            ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
+                switch tapType {
+                case .send:
+                    onSend()
+                case .voice:
+                    print("ContentView: Voice")
+                    guard let _ = chatViewModel.session else {
+                        return
+                    }
+                    self.isShowVoice.toggle()
+                case .video:
+                    print("ContentView: Video")
+                    guard let _ = chatViewModel.session else {
+                        return
+                    }
+                    self.isShowVideo.toggle()
+                case .stop:
+                    print("ContentView: Stop")
+                    chatViewModel.stopAnswering()
+                }
+            }
+            .sheet(isPresented: $isShowVoice) {
+                AudioView(session: chatViewModel.session!)
+            }
+            .sheet(isPresented: $isShowVideo) {
+                VideoView(session: chatViewModel.session!)
+            }
+            .aiChatTheme(aiChattheme)
+            .navigationTitle("Agent Chat")
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear() {
+                Task {
+                    await chatViewModel.onInitialize()
+                }
+            }
+        }
     }
 }
 
