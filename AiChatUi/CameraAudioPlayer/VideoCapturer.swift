@@ -149,7 +149,6 @@ class VideoCapturer: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         guard let jpegData = convertPixelBufferToJPEG(pixelBuffer) else {
             return
         }
-        
         DispatchQueue.main.async { [weak self] in
             if let self {
                 self.delegate?.videoCapturer(self, didCaptureFrame: jpegData)

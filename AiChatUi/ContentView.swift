@@ -32,6 +32,8 @@ struct ContentView: View {
     
     var body: some View {
         
+//        VideoView(session: Session(id: "id", appName: "appName", userId: "userid", state: [:], events: [], lastUpdateTime: 1.0))
+        
         NavigationView {
             ChatView(viewModel: chatViewModel, inputText: $inputText) { tapType in
                 switch tapType {

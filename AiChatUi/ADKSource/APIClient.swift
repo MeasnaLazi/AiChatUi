@@ -70,7 +70,7 @@ struct APIClient: RequestExecutor {
                 let textData = Data("true".utf8)
                 return try T.decode(textData)
             }
-//            print("APIClient: data - \(String(describing: String(data: data, encoding: .utf8)))")
+            print("APIClient: data - \(String(describing: String(data: data, encoding: .utf8)))")
             return try T.decode(data)
             
         } catch let decodingError as DecodingError {

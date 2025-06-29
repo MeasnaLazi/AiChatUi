@@ -20,6 +20,9 @@ class VideoViewModel: ObservableObject {
     @Published var isTorchOn = false
     @Published var isBackCamera = true
     
+    private var timerVideoFrame: Timer?
+    private var isProcessNextFrame = false
+    
     let cameraLivePlayer: CameraLivePlayer = CameraLivePlayerImp()
     
     func startConnection(sessionId: String) async {
@@ -74,6 +77,13 @@ class VideoViewModel: ObservableObject {
             print("VideoViewModel: WebSocket is not initialize!")
             return
         }
+        
+        timerVideoFrame = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.isProcessNextFrame = true
+            }
+        }
+        
         isStreaming = true
         
         cameraLivePlayer.startAudioRecording { data in
@@ -85,10 +95,13 @@ class VideoViewModel: ObservableObject {
         }
         
         cameraLivePlayer.startVideoRecording { data in
-            print("VideoViewModel: Frame Sending data...")
-            let dataString = self.createSendString(data: data, type: "image/jpeg")
-            Task {
-                try? await webSocket.send(string: dataString)
+            if self.isProcessNextFrame {
+                print("VideoViewModel: Frame Sending data...")
+                let dataString = self.createSendString(data: data, type: "image/jpeg")
+                Task {
+                    try? await webSocket.send(string: dataString)
+                }
+                self.isProcessNextFrame = false
             }
         }
     }
@@ -101,6 +114,8 @@ class VideoViewModel: ObservableObject {
             cameraLivePlayer.stopAudioPlaying()
             cameraLivePlayer.stopVideoRecording()
         }
+        timerVideoFrame?.invalidate()
+        timerVideoFrame = nil
     }
     
     func cleanUp() {
@@ -146,7 +161,13 @@ class VideoViewModel: ObservableObject {
     }
     
     private func createSendString(data: Data, type: String) -> String {
-        let base64 = data.base64EncodedString()
+        var sentData = data
+        
+        if type == "image/jpeg" {
+            sentData = self.resizeHalfJPEGData(data)!
+        }
+        
+        let base64 = sentData.base64EncodedString()
         let payload: [String: String] = ["mime_type": type, "data": base64]
         let encoder = JSONEncoder()
 
@@ -210,5 +231,25 @@ class VideoViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    private func resizeHalfJPEGData(_ jpegData: Data) -> Data? {
+        guard let uiImage = UIImage(data: jpegData) else {
+            return nil
+        }
+
+        let originalSize = uiImage.size
+        let targetSize = CGSize(width: originalSize.width / 2.0, height: originalSize.height / 2.0)
+
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1.0
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+
+        let resizedImage = renderer.image { context in
+            uiImage.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+
+        return resizedImage.jpegData(compressionQuality: 1.0)
     }
 }
